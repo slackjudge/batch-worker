@@ -42,6 +42,28 @@ public class UserJdbcRepository {
     }
 
 
+    /*==========================
+    *
+    *UserJdbcRepository
+    * bojId를 기준을 기준으로 유저의 백준 티어 갱신 쿼리
+    * @parm bojId : 백준 아이디 newTier : 새로운 티어
+    * @return void
+    * @author kimdoyeon
+    * @version 1.0.0
+    * @date 25. 12. 7.
+    *
+    ==========================**/
+    public void updateUsersTier(String bojId,int newTier){
+        String sql= """
+                UPDATE
+                    users
+                SET
+                    boj_tier = ?
+                WHERE
+                    baekjoon_id = ?
+                """;
+        jdbcTemplate.update(sql,newTier,bojId);
+    }
 
 
 }
