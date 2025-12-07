@@ -26,11 +26,11 @@ public class UserJdbcRepository {
     public List<UserInfo> findAllUserInfo() {
         String sql = """
                 SELECT
-                    u.baekjoon_id,
-                    u.user_id,
-                    u.boj_tier
+                    baekjoon_id,
+                    user_id,
+                    boj_tier
                 FROM
-                    users AS u
+                    users
                 """;
 
         return jdbcTemplate.query(sql, ((rs, rowNum) ->
