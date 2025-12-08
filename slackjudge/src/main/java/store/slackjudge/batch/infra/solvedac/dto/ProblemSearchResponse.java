@@ -1,6 +1,9 @@
 package store.slackjudge.batch.infra.solvedac.dto;
 
-public record ProblemSearchResponse(
+import java.util.List;
 
+public record ProblemSearchResponse(
+    int count,
+    List<ProblemInfoResponse> items
 ) {
 }

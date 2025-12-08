@@ -65,7 +65,7 @@ public class SolvedAcUserInfoClient extends AbstractSolvedAcApiClient<UserSearch
 
             for (UserInfoResponse userInfo:response.items()){
                 //유저의 백준 아이디가 정확히 일치하는 경우
-                if (userInfo.getHandle().equalsIgnoreCase(bojId)){
+                if (userInfo.handle().equalsIgnoreCase(bojId)){
                     return userInfo;
                 }
             }
