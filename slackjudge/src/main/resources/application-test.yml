@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql://localhost:5432/app
+    username: kimdoyeon
+    password:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver

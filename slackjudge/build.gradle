@@ -35,6 +35,8 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
+
+	//Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-batch-jdbc-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-batch-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-jdbc-test'
@@ -42,6 +44,10 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-mongodb-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-mongodb-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation "org.testcontainers:testcontainers" // testcontainers
+    testImplementation 'org.testcontainers:postgresql' // PostgreSQL 모듈
+    testImplementation "org.testcontainers:junit-jupiter" // JUnit 5 연동
+	testImplementation 'org.testcontainers:jdbc'
 }
 
 tasks.named('test') {
