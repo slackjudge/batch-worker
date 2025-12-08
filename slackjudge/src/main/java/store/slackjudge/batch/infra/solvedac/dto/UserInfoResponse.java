@@ -10,39 +10,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class UserInfoResponse {
-    private String handle;
-    private String bio;
-    private boolean verified;
-    private String badgeId;
-    private String backgroundId;
-    private String profileImageUrl;
-    private int solvedCount;
-    private int voteCount;
-
-    @JsonProperty("class")
-    private int clazz; // class는 예약어 이름 변경
-
-    private String classDecoration;
-    private int rivalCount;
-    private int reverseRivalCount;
-    private int tier;
-    private int rating;
-    private int ratingByProblemsSum;
-    private int ratingByClass;
-    private int ratingBySolvedCount;
-    private int ratingByVoteCount;
-    private int overRating;
-    private int overRatingCutoff;
-    private int arenaTier;
-    private int arenaRating;
-    private int arenaMaxTier;
-    private int arenaMaxRating;
-    private int arenaCompetedRoundCount;
-    private int maxStreak;
-    private int coins;
-    private int stardusts;
-    private String joinedAt;
-    private String bannedUntil;
-    private String proUntil;
-    private int rank;
+    private int solvedCount;    //푼 문제 수
+    private String handle;      //백준 아이디
+    private int tier;           //백준 티어
+    private int rating;         //백준 기준 점수
 }
