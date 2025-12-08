@@ -10,6 +10,10 @@ import store.slackjudge.batch.infra.solvedac.dto.UserSearchResponse;
 import store.slackjudge.batch.infra.solvedac.util.UrlBuilder;
 
 import java.util.Map;
+
+/**
+ * 백준 유저의 정보(백준 티어, 푼 문제 수) 조회 클래스
+ */
 @Component
 @Slf4j
 public class SolvedAcUserInfoClient extends AbstractSolvedAcApiClient<UserSearchResponse>{
@@ -28,6 +32,17 @@ public class SolvedAcUserInfoClient extends AbstractSolvedAcApiClient<UserSearch
         this.objectMapper=objectMapper;
     }
 
+    /*==========================
+    *
+    *SolvedAcUserInfoClient
+    * api 호출 시 파라미터 바인딩 메서드
+    * @parm bojId:백준 아이디
+    * @return HashMap 형태의 파라미터명-파라미터 값 반환
+    * @author kimdoyeon
+    * @version 1.0.0
+    * @date 25. 12. 8.
+    *
+    ==========================**/
     @Override
     protected Map<String, String> createRequestParameter(String bojId) {
         return Map.of(
@@ -35,11 +50,33 @@ public class SolvedAcUserInfoClient extends AbstractSolvedAcApiClient<UserSearch
         );
     }
 
+    /*==========================
+    *
+    *SolvedAcUserInfoClient
+    * 유저 정보 조회 url 반환
+    * @parm x
+    * @return baseUrl + 유저 정보 조회 url
+    * @author kimdoyeon
+    * @version 1.0.0
+    * @date 25. 12. 8.
+    *
+    ==========================**/
     @Override
     protected String setUpUrl() {
         return properties.getApi().getUserInfo();
     }
 
+    /*==========================
+    *
+    *SolvedAcUserInfoClient
+    *
+    * @parm response:solved.ac API 응답값
+    * @return UserSearchResponse:필요 값(count:푼 문제 수,items:문제 정보들)
+    * @author kimdoyeon
+    * @version 1.0.0
+    * @date 25. 12. 8.
+    *
+    ==========================**/
     @Override
     protected UserSearchResponse parseResponse(String response) {
         try {
@@ -50,11 +87,24 @@ public class SolvedAcUserInfoClient extends AbstractSolvedAcApiClient<UserSearch
         }
     }
 
+
     @Override
     protected void handleError(Exception e) {
         //TODO:에러 처리 구체화 진행 예정
     }
 
+    /*==========================
+    *
+    *SolvedAcUserInfoClient
+    * solved.ac API 백준 아이디로 유저 정보 조회 시 LIKE 쿼리로 인해 prefix가 같으면 여러 유저 조회
+    * => 입력값 대해서만 응답값 필터링 메서드
+    * @parm bojId:백준 아이디
+    * @return UserInfoResponse:유저의 정보
+    * @author kimdoyeon
+    * @version 1.0.0
+    * @date 25. 12. 8.
+    *
+    ==========================**/
     public UserInfoResponse findExactUser(String bojId){
         int page=0;
 
