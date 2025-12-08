@@ -69,7 +69,7 @@ public class SolvedAcUserInfoClient extends AbstractSolvedAcApiClient<UserSearch
     /*==========================
     *
     *SolvedAcUserInfoClient
-    *
+    * 응답 Json 파싱 메서드
     * @parm response:solved.ac API 응답값
     * @return UserSearchResponse:필요 값(count:푼 문제 수,items:문제 정보들)
     * @author kimdoyeon

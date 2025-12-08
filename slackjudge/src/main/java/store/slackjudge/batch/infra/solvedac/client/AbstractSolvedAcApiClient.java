@@ -7,8 +7,11 @@ import store.slackjudge.batch.infra.solvedac.util.UrlBuilder;
 import java.util.Map;
 import java.util.function.Supplier;
 
+/**
+ * method-template 패턴으로 여러 solved.ac API 통신 구현을 위한 추상 클래스
+ * @param <T>
+ */
 @Slf4j
-
 public abstract class AbstractSolvedAcApiClient <T>{
     //재시도 횟수
     private final int RETRY=5;
