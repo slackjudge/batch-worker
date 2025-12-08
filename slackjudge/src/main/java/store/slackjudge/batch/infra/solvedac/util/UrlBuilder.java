@@ -1,4 +1,4 @@
-package store.slackjudge.batch.infra;
+package store.slackjudge.batch.infra.solvedac.util;
 
 import org.springframework.stereotype.Component;
 

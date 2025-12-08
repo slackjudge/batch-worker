@@ -1,8 +1,8 @@
-package store.slackjudge.batch.infra;
+package store.slackjudge.batch.infra.solvedac.client;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.reactive.function.client.WebClient;
+import store.slackjudge.batch.infra.solvedac.util.UrlBuilder;
 
 import java.util.Map;
 import java.util.function.Supplier;
@@ -62,16 +62,10 @@ public abstract class AbstractSolvedAcApiClient <T>{
             }
         }
     }
-    /**
-     * =====================
-     *        공통 로직
-     * =====================
-     */
 
     //요청
-    public final T call(String bojId){
+    protected T callWithParams(Map<String,String> params){
         String baseUrl=setUpUrl();
-        Map<String,String> params=createRequestParameter(bojId);
         String url=urlBuilder.buildUrl(baseUrl,params);
 
         log.debug("[calling solved.ac API] url : {}",url);
@@ -82,6 +76,24 @@ public abstract class AbstractSolvedAcApiClient <T>{
             handleError(e);
             throw e;
         }
+    }
+    /**
+     * =====================
+     *        공통 로직
+     * =====================
+     */
+
+    //페이징 쿼리 요청
+    public final T callWithPage(String bojId,int page){
+        Map<String,String> params=createRequestParameter(bojId);
+        params.put("page",String.valueOf(page));
+
+        return callWithParams(params);
+    }
+
+    //일반 요청
+    public final T callWIthNonPage(String bojId){
+        return callWithParams(createRequestParameter(bojId));
     }
 
 }
