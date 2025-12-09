@@ -2,6 +2,8 @@ package store.slackjudge.batch.infra.solvedac.util;
 
 import org.springframework.stereotype.Component;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -20,7 +22,7 @@ public class UrlBuilder {
     ==========================**/
     public String buildUrl(String baseUrl, Map<String,String> params){
         String queryString = params.entrySet().stream()
-                .map(e->e.getKey() + "="+e.getValue())
+                .map(e-> e.getKey() + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8))
                 .collect(Collectors.joining("&"));
 
         return baseUrl+"?"+queryString;
