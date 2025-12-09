@@ -216,4 +216,55 @@ class AbstractSolvedAcApiClientTest {
         }
     }
 
+    @Nested
+    @DisplayName("request 동작 테스트")
+
+    class requestTests{
+        @DisplayName("request 호출 성공")
+        @Test
+        void request_Success(){
+            //given
+            String bojId="test";
+            int page=1;
+            String url=BASE_URL+"?query="+bojId+"&page="+page;
+            String expectedJson="{\"result\":\"success\"}";
+
+            when(webClient.get()).thenReturn(requestHeadersUriSpec);
+            when(requestHeadersUriSpec.uri(url)).thenReturn(requestHeadersSpec);
+            when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+            when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(expectedJson));
+
+            //when
+            String result=client.request(url);
+
+            //then
+            assertThat(result).isEqualTo(expectedJson);
+            verify(webClient).get();
+            verify(requestHeadersUriSpec).uri(url);
+            verify(requestHeadersSpec).retrieve();
+        }
+
+        @DisplayName("request 호출 실패시 예외 발생")
+        @Test
+        void request_Failed(){
+            //given
+            String bojId="test";
+            int page=1;
+            String url=BASE_URL+"?query="+bojId+"&page="+page;
+            String expectedJson="{\"result\":\"fail\"}";
+
+            when(webClient.get()).thenReturn(requestHeadersUriSpec);
+            when(requestHeadersUriSpec.uri(url)).thenReturn(requestHeadersSpec);
+            when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+
+            //when
+            when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.error(new RuntimeException("network error")));
+
+            //then
+            assertThatThrownBy(()->client.request(url))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessage("network error");
+        }
+    }
+
 }
