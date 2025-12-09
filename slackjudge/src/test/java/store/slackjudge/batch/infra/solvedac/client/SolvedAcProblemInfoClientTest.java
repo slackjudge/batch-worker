@@ -164,6 +164,31 @@ class SolvedAcProblemInfoClientTest {
             assertThat(response.count()).isEqualTo(0);
         }
 
+        @DisplayName("잘못된 값으로 json 파싱 시 실패 - RuntimeException 예외 발생")
+        @Test
+        void parseResponse_Invalid_Json(){
+            //given
+            String invalidJson_1 = """
+                    {
+                        "count":,
+                    }
+                    """;
+            String invalidJson_2="""
+                    {
+                        "items":1,
+                    
+                    """;
+            //when & then
+            assertThatThrownBy(()->client.parseResponse(invalidJson_1))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessage("[calling solved.ac API] fetch problemInfo api json parsing error");
+
+            assertThatThrownBy(()->client.parseResponse(invalidJson_2))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessage("[calling solved.ac API] fetch problemInfo api json parsing error");
+
+        }
+
     }
 
 }
