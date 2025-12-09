@@ -19,7 +19,7 @@ import java.util.Map;
 @Component
 @Slf4j
 public class SolvedAcUserInfoClient extends AbstractSolvedAcApiClient<UserSearchResponse>{
-
+     private final static int MIN_PAGE=0;
     private final SolvedAcProperties properties;
     private final ObjectMapper objectMapper;
 
@@ -49,6 +49,12 @@ public class SolvedAcUserInfoClient extends AbstractSolvedAcApiClient<UserSearch
     protected Map<String, String> createRequestParameter(String bojId,int page) {
         Map<String,String> params=new HashMap<>();
         params.put("query",bojId);
+
+        if (page<MIN_PAGE){
+            params.put("page",String.valueOf(0));
+            return params;
+        }
+
         params.put("page",String.valueOf(page));
 
         return params;
