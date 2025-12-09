@@ -99,4 +99,26 @@ class SolvedAcProblemInfoClientTest {
         }
     }
 
+    @Nested
+    @DisplayName("setUpUrl 테스트")
+    class SetUpUrlTests{
+        @BeforeEach
+        void setUp(){
+            when(properties.getApi()).thenReturn(api);
+            when(api.getProblemInfo()).thenReturn(BASE_URL);
+        }
+
+        @Test
+        @DisplayName("properties에서 https://solved.ac/api/v3/search/problem를 반환")
+        void setUpUrl_ReturnCorrectUrl(){
+            //when
+            String url=client.setUpUrl();
+
+            //then
+            assertThat(url).isEqualTo(BASE_URL);
+            verify(properties).getApi();
+            verify(api).getProblemInfo();
+        }
+    }
+
 }
