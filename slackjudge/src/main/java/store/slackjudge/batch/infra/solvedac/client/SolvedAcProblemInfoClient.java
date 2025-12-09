@@ -19,6 +19,8 @@ import java.util.*;
 public class SolvedAcProblemInfoClient extends AbstractSolvedAcApiClient<ProblemSearchResponse> {
     private final SolvedAcProperties properties;
     private final ObjectMapper objectMapper;
+    private final static int MAX_PAGE=689;
+    private final static int MIN_PAGE=1;
 
     protected SolvedAcProblemInfoClient(WebClient webClient, UrlBuilder urlBuilder, SolvedAcProperties properties, ObjectMapper objectMapper) {
         super(webClient, urlBuilder);
@@ -39,8 +41,19 @@ public class SolvedAcProblemInfoClient extends AbstractSolvedAcApiClient<Problem
     ==========================**/
     @Override
     protected Map<String, String> createRequestParameter(String bojId,int page) {
+        /**
+         * 현재 존재하는 백준 문제 개수 : 34889
+         * 최대 페이징 제한 : 689
+         */
         Map<String,String> params=new HashMap<>();
         params.put("query","solved_by:"+bojId);
+
+        if (page<MIN_PAGE || page>MAX_PAGE) {
+            log.warn("[invalid page value] max page value : {} min page value : {} now page value : {}",MAX_PAGE,MIN_PAGE,page);
+            params.put("page",String.valueOf(1));
+            return params;
+        }
+
         params.put("page",String.valueOf(page));
 
         return params;
