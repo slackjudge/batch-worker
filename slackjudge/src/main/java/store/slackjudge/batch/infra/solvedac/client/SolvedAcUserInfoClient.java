@@ -2,6 +2,7 @@ package store.slackjudge.batch.infra.solvedac.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import store.slackjudge.batch.infra.solvedac.SolvedAcProperties;
@@ -9,6 +10,7 @@ import store.slackjudge.batch.infra.solvedac.dto.UserInfoResponse;
 import store.slackjudge.batch.infra.solvedac.dto.UserSearchResponse;
 import store.slackjudge.batch.infra.solvedac.util.UrlBuilder;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -44,10 +46,12 @@ public class SolvedAcUserInfoClient extends AbstractSolvedAcApiClient<UserSearch
     *
     ==========================**/
     @Override
-    protected Map<String, String> createRequestParameter(String bojId) {
-        return Map.of(
-                "query",bojId
-        );
+    protected Map<String, String> createRequestParameter(String bojId,int page) {
+        Map<String,String> params=new HashMap<>();
+        params.put("query",bojId);
+        params.put("page",String.valueOf(page));
+
+        return params;
     }
 
     /*==========================
@@ -105,12 +109,14 @@ public class SolvedAcUserInfoClient extends AbstractSolvedAcApiClient<UserSearch
     * @date 25. 12. 8.
     *
     ==========================**/
-    public UserInfoResponse findExactUser(String bojId){
+
+    //TODO:page 증가하면서 특정 유저 찾기 -> 배치 job에서 수행
+    /*public UserInfoResponse findExactUser(String bojId){
         int page=0;
 
         while (true){
             UserSearchResponse response=this.callWithPage(bojId,page);
-
+            log.info("[calling solved.ac API] call with page user response : {}",response);
             if (response.items()==null || response.items().isEmpty()) return null;
 
             for (UserInfoResponse userInfo:response.items()){
@@ -122,5 +128,5 @@ public class SolvedAcUserInfoClient extends AbstractSolvedAcApiClient<UserSearch
 
             page++;
         }
-    }
+    }*/
 }

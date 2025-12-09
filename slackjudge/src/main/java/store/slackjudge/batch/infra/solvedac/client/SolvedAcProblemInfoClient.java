@@ -5,10 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import store.slackjudge.batch.infra.solvedac.SolvedAcProperties;
+import store.slackjudge.batch.infra.solvedac.dto.ProblemInfoResponse;
 import store.slackjudge.batch.infra.solvedac.dto.ProblemSearchResponse;
 import store.slackjudge.batch.infra.solvedac.util.UrlBuilder;
 
-import java.util.Map;
+import java.util.*;
+
 /**
  * 백준 문제 정보(문제 번호) 조회 클래스
  */
@@ -36,8 +38,12 @@ public class SolvedAcProblemInfoClient extends AbstractSolvedAcApiClient<Problem
     *
     ==========================**/
     @Override
-    protected Map<String, String> createRequestParameter(String bojId) {
-        return Map.of("query","solved_by:"+bojId);
+    protected Map<String, String> createRequestParameter(String bojId,int page) {
+        Map<String,String> params=new HashMap<>();
+        params.put("query","solved_by:"+bojId);
+        params.put("page",String.valueOf(page));
+
+        return params;
     }
 
     /*==========================
@@ -71,8 +77,8 @@ public class SolvedAcProblemInfoClient extends AbstractSolvedAcApiClient<Problem
     protected ProblemSearchResponse parseResponse(String response) {
         try {
             return objectMapper.readValue(response, ProblemSearchResponse.class);
-        }catch (Exception e){
-            log.error("[calling solved.ac API] fetch problemInfo api json parsing error : {}",e.getMessage());
+        } catch (Exception e) {
+            log.error("[calling solved.ac API] fetch problemInfo api json parsing error : {}", e.getMessage());
             throw new RuntimeException("[calling solved.ac API] fetch problemInfo api json parsing error");
         }
     }
@@ -81,4 +87,29 @@ public class SolvedAcProblemInfoClient extends AbstractSolvedAcApiClient<Problem
     protected void handleError(Exception e) {
         //TODO:에러 처리 구체화 진행 예정
     }
+
+     //TODO:page 증가하면서 모든 문제 찾기 -> 배치 job에서 수행
+    /*public List<Integer> fetchAllProblems(String bojId) {
+        List<Integer> allProblemIds = new ArrayList<>();
+        int page = 1;
+
+        while (true) {
+            ProblemSearchResponse response = this.callWithPage(bojId, page);
+            log.info("[calling solved.ac API] call with page problem response : {}", response);
+            if (response.items() == null || response.items().isEmpty()) {
+                break;
+            }
+            log.info("[calling solved.ac API] fetch problemInfo api json parsing size : {}", response.items().size());
+
+            allProblemIds.addAll(
+                    response.items().stream()
+                            .map(ProblemInfoResponse::problemId)
+                            .toList()
+            );
+
+            page++;
+        }
+
+        return allProblemIds;
+    }*/
 }

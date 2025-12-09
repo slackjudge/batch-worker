@@ -23,6 +23,6 @@ public class UrlBuilder {
                 .map(e->e.getKey() + "="+e.getValue())
                 .collect(Collectors.joining("&"));
 
-        return baseUrl+queryString;
+        return baseUrl+"?"+queryString;
     }
 }
