@@ -1,5 +1,6 @@
 package store.slackjudge.batch.infra.solvedac.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,10 +12,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 import store.slackjudge.batch.infra.solvedac.SolvedAcProperties;
+import store.slackjudge.batch.infra.solvedac.dto.ProblemSearchResponse;
 
+import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,12 +43,7 @@ class SolvedAcProblemInfoClientTest {
     private SolvedAcProblemInfoClient client;
 
     private static final String BASE_URL="https://solved.ac/api/v3/search/problem";
-
-    @BeforeEach
-    void setUp(){
-        /*when(properties.getApi()).thenReturn(api);
-        when(api.getProblemInfo()).thenReturn(BASE_URL);*/
-    }
+    private static final String PATH="valid_problem.json"; //정상 응답 json
 
     @Nested
     @DisplayName("parameter 생성 테스트")
@@ -119,6 +118,52 @@ class SolvedAcProblemInfoClientTest {
             verify(properties).getApi();
             verify(api).getProblemInfo();
         }
+    }
+
+    @Nested
+    @DisplayName("parseResponse 테스트")
+    class ParseResponseTests{
+        @DisplayName("json 정상 파싱")
+        @Test
+        void parseResponse_ValidJson() throws IOException {
+            //given
+            String json=new String(
+                    Objects.requireNonNull(
+                            Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream(PATH)).readAllBytes()
+                    )
+            );
+
+            //when
+            ProblemSearchResponse response=client.parseResponse(json);
+
+            //then
+            assertThat(response).isNotNull();
+            assertThat(response.count()).isEqualTo(2);
+            assertThat(response.items()).isNotEmpty();
+            assertThat(response.items().get(0).problemId()).isEqualTo(1000);
+            assertThat(response.items().get(1).problemId()).isEqualTo(1001);
+        }
+
+        @DisplayName("items가 빈 배열로 반환될 때 json 파싱 성공")
+        @Test
+        void parseResponse_Validation_With_Empty_Items(){
+            //given
+            String json = """
+                    {
+                        "count":0,
+                        "items":[]
+                    }
+                    """;
+
+            //when
+            ProblemSearchResponse response=client.parseResponse(json);
+
+            //then
+            assertThat(response).isNotNull();
+            assertThat(response.items()).isEqualTo(Collections.EMPTY_LIST);
+            assertThat(response.count()).isEqualTo(0);
+        }
+
     }
 
 }

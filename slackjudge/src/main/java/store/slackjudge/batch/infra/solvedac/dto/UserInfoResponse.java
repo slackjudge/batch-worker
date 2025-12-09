@@ -1,13 +1,12 @@
 package store.slackjudge.batch.infra.solvedac.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * solved.ac API 유저 정보 파싱용 dto
  */
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record UserInfoResponse(
         int solvedCount,    //푼 문제 수
         String handle,      //백준 아이디
