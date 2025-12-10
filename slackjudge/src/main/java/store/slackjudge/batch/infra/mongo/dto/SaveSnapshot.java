@@ -14,6 +14,7 @@ public record SaveSnapshot(
     Set<Integer> solvedProblemIds,
     Integer solvedCount,
     Integer tier,
-    Long userId
+    Long userId,
+    Integer rating
 ) {
 }

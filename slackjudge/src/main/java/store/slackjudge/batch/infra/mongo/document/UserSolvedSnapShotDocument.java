@@ -31,6 +31,9 @@ public class UserSolvedSnapShotDocument {
 
     private Integer tier;
 
+    @Builder.Default
+    private Integer rating=0;
+
     @NotNull
     @Field(name = "user_id")
     private Long userId;

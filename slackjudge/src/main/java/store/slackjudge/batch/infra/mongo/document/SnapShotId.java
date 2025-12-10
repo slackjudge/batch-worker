@@ -1,10 +1,7 @@
 package store.slackjudge.batch.infra.mongo.document;
 
 import jakarta.persistence.Embeddable;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -12,6 +9,7 @@ import java.util.Objects;
 
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @RequiredArgsConstructor
+@Getter
 public class SnapShotId implements Serializable {
     private String bojId;
     private LocalDateTime snapShotAt;

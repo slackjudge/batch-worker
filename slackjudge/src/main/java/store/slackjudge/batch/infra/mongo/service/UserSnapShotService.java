@@ -11,6 +11,9 @@ import store.slackjudge.batch.infra.mongo.repository.UserSolvedSnapShotRepositor
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+/**
+ * user의 스냅샷 저장 / 조회 클래스
+ */
 @Service
 @RequiredArgsConstructor
 public class UserSnapShotService {
