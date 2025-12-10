@@ -3,15 +3,16 @@ package store.slackjudge.batch.infra.mongo.document;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
+import org.antlr.v4.runtime.misc.NotNull;
+import org.hibernate.annotations.Filter;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
 import java.util.Set;
 
+@Builder
 @Document(collection = "snapshot")
 @Getter
 @RequiredArgsConstructor
@@ -21,11 +22,16 @@ public class UserSolvedSnapShotDocument {
     @Id
     private SnapShotId id;
 
+    @Field(name = "problems_ids")
     private Set<Integer> solvedProblemIds;
 
-    private Integer solvedCount;
+    @Builder.Default
+    @Field(name = "solved_count")
+    private Integer solvedCount=0;
 
     private Integer tier;
 
+    @NotNull
+    @Field(name = "user_id")
     private Long userId;
 }
