@@ -10,12 +10,15 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 @RequiredArgsConstructor
 public class SnapShotId implements Serializable {
     private String bojId;
     private LocalDateTime snapShotAt;
 
+    public static SnapShotId of(String bojId,LocalDateTime snapShotAt){
+        return new SnapShotId(bojId,snapShotAt);
+    }
     @Override
     public boolean equals(Object o){
         if(this==o) return true;
