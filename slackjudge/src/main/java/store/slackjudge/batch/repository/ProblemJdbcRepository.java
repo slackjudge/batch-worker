@@ -1,0 +1,40 @@
+package store.slackjudge.batch.repository;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
+
+@Repository
+@RequiredArgsConstructor
+public class ProblemJdbcRepository {
+    private final JdbcTemplate jdbcTemplate;
+
+    /*==========================
+    *
+    *ProblemJdbcRepository
+    * 새로 문제를 풀이한 시간 + 풀이 유무 최신화 쿼리
+    * index(user_id,solved_time) 인덱스 생성 + unique 처리
+    * 1. 이미 (user_id,solved_time)의 데이터 존재 -> solved_time만 최신화
+    * 2. 기존 값 존재하지 않음 -> INSERT
+    * @parm batchTime:집계 기준일 / userId:users 테이블 PK / problemNumber:문제번호
+    * @return void
+    * @author kimdoyeon
+    * @version 1.0.0
+    * @date 25. 12. 8.
+    *
+    ==========================**/
+    public void updateProblemSolved(LocalDateTime batchTime,Long userId,Integer problemNumber){
+        String sql= """
+                INSERT INTO
+                    users_problem (user_id,problem_id,is_solved, solved_time)
+                VALUES
+                    (?, ?, true, ?)
+                ON CONFLICT
+                    (user_id, problem_id)
+                DO UPDATE SET solved_time = EXCLUDED.solved_time
+                """;
+        jdbcTemplate.update(sql,userId,batchTime,problemNumber);
+    }
+}
