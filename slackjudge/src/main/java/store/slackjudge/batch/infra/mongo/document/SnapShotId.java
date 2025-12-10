@@ -10,7 +10,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@Embeddable
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class SnapShotId implements Serializable {
     private String bojId;
     private LocalDateTime snapShotAt;

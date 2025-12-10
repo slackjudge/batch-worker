@@ -12,14 +12,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.List;
 import java.util.Set;
 
-@Entity
 @Document(collection = "snapshot")
 @Getter
 @RequiredArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class UserSolvedSnapShotDocument {
     //(백준 아이디, 배치 동작 시간) 복합 키
-    @EmbeddedId
+    @Id
     private SnapShotId id;
 
     private Set<Integer> solvedProblemIds;
@@ -27,4 +26,6 @@ public class UserSolvedSnapShotDocument {
     private Integer solvedCount;
 
     private Integer tier;
+
+    private Long userId;
 }
