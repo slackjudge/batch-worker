@@ -33,7 +33,7 @@ public class LoadAllUsersTasklet implements Tasklet {
     private StepExecution stepExecution;
 
     @Override
-    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext){
         //모든 유저 정보 조회
         List<UserInfo> users=userJdbcRepository.findAllUserInfo();
         //햔재 step에 대한 메타데이터 객체
