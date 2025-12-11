@@ -45,6 +45,7 @@ dependencies {
     testImplementation 'org.testcontainers:postgresql' // PostgreSQL 모듈
     testImplementation "org.testcontainers:junit-jupiter" // JUnit 5 연동
 	testImplementation 'org.testcontainers:jdbc'
+	testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.11.0'
 }
 
 tasks.named('test') {
