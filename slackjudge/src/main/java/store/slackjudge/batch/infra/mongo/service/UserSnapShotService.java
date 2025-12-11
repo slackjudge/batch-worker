@@ -9,6 +9,7 @@ import store.slackjudge.batch.infra.mongo.dto.SaveSnapshot;
 import store.slackjudge.batch.infra.mongo.repository.UserSolvedSnapShotRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -59,5 +60,25 @@ public class UserSnapShotService {
 
         //객체 저장
         return repository.save(document);
+    }
+
+    /*==========================
+    *
+    *UserSnapShotService
+    * 1시간 전 모든 유저의 스냅 샷 조회 메서드
+    * @parm bojId:백준 아이디 리스트 / previousTime:1시간 전 시간
+    * @return 유저+문제 풀이 정보 도큐먼트 리스트
+    * @author kimdoyeon
+    * @version 1.0.0
+    * @date 25. 12. 12.
+    *
+    ==========================**/
+    @Transactional(readOnly = true)
+    public List<UserSolvedSnapShotDocument> findUsersAllPreviousSnapshot(List<String> bojIds,LocalDateTime snapshotAt){
+        return bojIds
+                .stream()
+                .map(b->repository.findByIdBojIdAndIdSnapShotAt(b,snapshotAt))
+                .flatMap(Optional::stream)
+                .toList();
     }
 }
