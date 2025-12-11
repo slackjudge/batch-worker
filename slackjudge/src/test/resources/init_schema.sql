@@ -7,8 +7,7 @@ create table if not exists public.problem
     problem_url   varchar(255)
 );
 
-alter table public.problem
-    owner to kimdoyeon;
+
 
 create table if not exists public.problem_type
 (
@@ -17,8 +16,6 @@ create table if not exists public.problem_type
     problem_type_name varchar(100) not null
 );
 
-alter table public.problem_type
-    owner to kimdoyeon;
 
 create table if not exists public.problem_problem_type
 (
@@ -33,8 +30,6 @@ create table if not exists public.problem_problem_type
         unique (problem_type_id, problem_id)
 );
 
-alter table public.problem_problem_type
-    owner to kimdoyeon;
 
 create index if not exists idx_problem_type
     on public.problem_problem_type (problem_type_id);
@@ -48,7 +43,7 @@ create table if not exists public.users
     baekjoon_id        varchar(255)            not null
         unique,
     user_name          varchar(50)             not null,
-    boj_tier           varchar(100)            not null,
+    boj_tier           integer                 not null,
     team_name          varchar(255)            not null,
     total_solved_count integer   default 0     not null,
     is_alert_agreed    boolean   default true  not null,
@@ -57,9 +52,6 @@ create table if not exists public.users
     deleted_at         timestamp
 );
 
-
-alter table public.users
-    owner to kimdoyeon;
 
 create table if not exists public.users_problem
 (
@@ -75,6 +67,4 @@ create table if not exists public.users_problem
     solved_time      timestamp
 );
 
-alter table public.users_problem
-    owner to kimdoyeon;
 
