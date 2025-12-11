@@ -11,6 +11,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class BatchLogger {
 
+    /* ====================
+        JOB LOGGING
+       ==================== */
     public void jobStart(String jobName) {
         log.info(
                 "\n┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓" +
@@ -39,6 +42,11 @@ public class BatchLogger {
         );
     }
 
+
+
+    /* ====================
+        STEP LOGGING
+       ==================== */
     public void stepStart(String step) {
         log.info("\n──────────────────────────────────────────────\n▶ STEP: {} START", step);
     }
@@ -52,6 +60,20 @@ public class BatchLogger {
         );
     }
 
+    /** Step 전체가 실패 */
+    public void stepError(String stepName, String message, Throwable e) {
+        log.error(
+                "\n[STEP-ERROR] STEP '{}' FAILED\n" +
+                "Reason: {}\n",
+                stepName, message, e
+        );
+    }
+
+
+
+    /* ====================
+       USER / TASKLET LOGGING
+       ==================== */
     public void userBlock(Long userId, String bojId, String body) {
         log.info(
                 "\n┌─────────────────────────────────────────────┐" +
@@ -63,12 +85,23 @@ public class BatchLogger {
         );
     }
 
-    public void warn(String format, Object... args) {
-        log.warn(format, args);
+    /** Tasklet 내부에서 처리할 때 발생한 경고 */
+    public void taskletWarn(String message, Object... args) {
+        log.warn("[TASKLET-WARN] " + message, args);
     }
 
-    public void error(String format, Object... args) {
-        log.error(format, args);
+    /** Tasklet 내부에서 처리할 때 발생한 예외(해당 유저만 실패) */
+    public void taskletError(String message, Throwable e, Object... args) {
+        log.error("[TASKLET-ERROR] " + message, args, e);
+    }
+
+    /** 유저 단위 경고 */
+    public void userWarn(Long userId, String bojId, String message) {
+        log.warn("[WARN][USER:{}][BOJ:{}] {}", userId, bojId, message);
+    }
+
+    /** 유저 단위 심각한 오류 */
+    public void userError(Long userId, String bojId, String message, Throwable e) {
+        log.error("[ERROR][USER:{}][BOJ:{}] {}", userId, bojId, message, e);
     }
 }
-
