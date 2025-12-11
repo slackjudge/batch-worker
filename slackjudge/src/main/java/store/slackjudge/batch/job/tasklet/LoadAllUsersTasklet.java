@@ -21,22 +21,22 @@ import java.util.List;
  * [ step 01 ]
  * RDB로부터 모든 유저 정보를 조회하는 tasklet
  */
-@Slf4j
+
 @RequiredArgsConstructor
 @Component
 public class LoadAllUsersTasklet implements Tasklet {
     private final UserJdbcRepository userJdbcRepository;
+    private final BatchLogger logger;
 
     /**
      * next step : LoadSnapshotTasklet
      */
 
     private StepExecution stepExecution;
-    private BatchLogger logger;
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext){
-        logger.jobStart("LoadAllUsersTasklet");
+        logger.stepStart("LoadAllUsersTasklet");
         //시작 시간
         long startTime=System.currentTimeMillis();
 
@@ -51,7 +51,7 @@ public class LoadAllUsersTasklet implements Tasklet {
         //{ users : List<UserInfo> } 형태로 메타데이터 저장
         stepContext.put("users",users);
 
-        logger.stepEnd("LoadAL");
+        logger.stepEnd("LoadAllUsersTasklet","usersSize="+users.size(),"duration="+duration);
 
         return RepeatStatus.FINISHED;
     }
