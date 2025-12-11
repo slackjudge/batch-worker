@@ -67,4 +67,5 @@ create table if not exists public.users_problem
     solved_time      timestamp
 );
 
-
+ALTER TABLE users_problem
+ADD CONSTRAINT users_problem_unique UNIQUE (user_id, problem_id);

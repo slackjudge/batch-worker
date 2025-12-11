@@ -35,6 +35,6 @@ public class ProblemJdbcRepository {
                     (user_id, problem_id)
                 DO UPDATE SET solved_time = EXCLUDED.solved_time
                 """;
-        jdbcTemplate.update(sql,userId,batchTime,problemNumber);
+        jdbcTemplate.update(sql,userId,problemNumber,batchTime);
     }
 }
