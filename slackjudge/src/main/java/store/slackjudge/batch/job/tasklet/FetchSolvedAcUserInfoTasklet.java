@@ -12,20 +12,11 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
-import store.slackjudge.batch.common.CalculateSnapShotDate;
 import store.slackjudge.batch.config.BatchLogger;
 import store.slackjudge.batch.dto.UserInfo;
-import store.slackjudge.batch.infra.mongo.document.UserSolvedSnapShotDocument;
-import store.slackjudge.batch.infra.mongo.service.detector.DetectionContext;
-import store.slackjudge.batch.infra.solvedac.client.SolvedAcProblemInfoClient;
 import store.slackjudge.batch.infra.solvedac.client.SolvedAcUserInfoClient;
-import store.slackjudge.batch.infra.solvedac.dto.ProblemInfoResponse;
-import store.slackjudge.batch.infra.solvedac.dto.ProblemSearchResponse;
 import store.slackjudge.batch.infra.solvedac.dto.UserInfoResponse;
-import store.slackjudge.batch.infra.solvedac.dto.UserSearchResponse;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -59,9 +50,9 @@ public class FetchSolvedAcUserInfoTasklet implements Tasklet {
 
         for (UserInfo user : users) {
             try {
-                //solved.ac API에서 유저 정보 조회
+                //solved.ac API에서 유저 정보 조회 - RetryTemplate 재시도
                 UserInfoResponse solvedAcInfo = retryTemplate.execute(context ->
-                        userInfoClient.findExactUser(user.baekJoonId())
+                        userInfoClient.call(user.baekJoonId(),0)
                 );
 
                 //다음 step으로 전달할 메타데이터 객체

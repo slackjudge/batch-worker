@@ -162,7 +162,9 @@ public class DetectAndUpdateUserTierAndProblemTasklet implements Tasklet {
         //현재 step 메타 데이터 객체
         ExecutionContext stepContext=this.stepExecution.getExecutionContext();
 
-        //{ current }
+        //{ currentSnapshot :  Map<String, SaveSnapshot> }
+        stepContext.put("currentSnapshot",currentSnapshots);
+
         long duration=System.currentTimeMillis()-startTime;
         logger.stepEnd("DetectAndUpdateUserTierAndProblemTasklet","updated=",countOfUpdated,"total=",totalOfUser,"duration=",duration);
 
