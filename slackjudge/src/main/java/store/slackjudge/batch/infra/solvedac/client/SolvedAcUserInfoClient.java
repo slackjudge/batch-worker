@@ -83,7 +83,7 @@ public class SolvedAcUserInfoClient extends AbstractSolvedAcApiClient<UserInfoRe
             return objectMapper.readValue(response,UserInfoResponse.class);
         }catch (Exception e){
             log.error("[calling solved.ac API] fetch userInfo api json parsing error : {}",e.getMessage());
-            throw new RuntimeException("[calling solved.ac API] fetch userInfo api json parsing error");
+            throw new RuntimeException("[calling solved.ac API] fetch userInfo api json parsing error",e);
         }
     }
 
