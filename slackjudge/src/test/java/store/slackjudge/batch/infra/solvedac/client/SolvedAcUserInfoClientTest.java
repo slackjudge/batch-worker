@@ -45,7 +45,7 @@ class SolvedAcUserInfoClientTest {
     class CreateRequestParameterTests{
 
         @Test
-        @DisplayName("query + page가 붙은 url를 생성")
+        @DisplayName("handle + 백준Id 붙은 url를 생성")
         void createRequestParameter_WithSolvedByPrefix(){
             //given
             String bojId="test";
@@ -56,24 +56,7 @@ class SolvedAcUserInfoClientTest {
 
             //then
             assertThat(params)
-                    .containsEntry("query",bojId)
-                    .containsEntry("page",String.valueOf(page));
-        }
-
-        @Test
-        @DisplayName("page가 0보다 작을 시 페이지 기본값 0으로 파라미터 생성")
-        void createRequestParameter_WhenPageIsLessThanOne_UsesPageOne(){
-            //given
-            String bojId="test";
-            int page=-1;
-
-            //when
-            Map<String,String> params=client.createRequestParameter(bojId,page);
-
-            //then
-            assertThat(params)
-                    .containsEntry("query",bojId)
-                    .containsEntry("page",String.valueOf(0));
+                    .containsEntry("handle",bojId);
         }
     }
 
@@ -117,32 +100,12 @@ class SolvedAcUserInfoClientTest {
 
             //then
             assertThat(response).isNotNull();
-            assertThat(response.count()).isEqualTo(3);
-            assertThat(response.items()).isNotEmpty();
-            assertThat(response.items().get(0).handle()).isEqualTo("test1");
-            assertThat(response.items().get(1).handle()).isEqualTo("test2");
-            assertThat(response.items().get(2).handle()).isEqualTo("test3");
+            assertThat(response.handle()).isEqualTo("test");
+            assertThat(response.rating()).isEqualTo(1628);
+            assertThat(response.solvedCount()).isEqualTo(379);
+            assertThat(response.tier()).isEqualTo(16);
         }
 
-        @DisplayName("items가 빈 배열로 반환될 때 json 파싱 성공")
-        @Test
-        void parseResponse_Validation_With_Empty_Items(){
-            //given
-            String json = """
-                    {
-                        "count":0,
-                        "items":[]
-                    }
-                    """;
-
-            //when
-            UserSearchResponse response=client.parseResponse(json);
-
-            //then
-            assertThat(response).isNotNull();
-            assertThat(response.items()).isEqualTo(Collections.EMPTY_LIST);
-            assertThat(response.count()).isEqualTo(0);
-        }
 
         @DisplayName("잘못된 값으로 json 파싱 시 실패 - RuntimeException 예외 발생")
         @Test
