@@ -36,15 +36,15 @@ class UserJdbcRepositoryTest {
         jdbcTemplate.execute("TRUNCATE TABLE users RESTART IDENTITY CASCADE");
 
         String insert = """
-                INSERT INTO users (slack_id, baekjoon_id, user_name, boj_tier, team_name)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO users (slack_id, baekjoon_id, user_name, boj_tier, team_name,total_solved_count)
+                VALUES (?, ?, ?, ?, ?,?)
                 """;
 
         Object[][] dummyUsers = {
-                {"slack1", "test1", "user1", 10, "teamA"},
-                {"slack2", "test2", "user2", 20, "teamA"},
-                {"slack3", "test3", "user3", 30, "teamB"},
-                {"slack4", "test4", "user4", 40, "teamB"}
+                {"slack1", "test1", "user1", 10, "teamA",100},
+                {"slack2", "test2", "user2", 20, "teamA",200},
+                {"slack3", "test3", "user3", 30, "teamB",300},
+                {"slack4", "test4", "user4", 40, "teamB",400}
         };
 
         for (Object[] user : dummyUsers) {
@@ -76,14 +76,19 @@ class UserJdbcRepositoryTest {
         //given
         String bojId="test3"; //test3 유저 업데이트
         int newTier=42;
+        int newSolvedCount=3333;
 
         //when
-        repository.updateUsersTier(bojId,newTier);
+        repository.updateUsersTier(bojId,newTier,newSolvedCount);
 
         //then
-        String sql="SELECT boj_tier FROM users WHERE baekjoon_id = ?";
-        String fetchUsersTier=jdbcTemplate.queryForObject(sql,String.class,bojId);
+        String tierSql="SELECT boj_tier FROM users WHERE baekjoon_id = ?";
+        String countSql="SELECT total_solved_count FROM users WHERE baekjoon_id = ?";
+
+        String fetchUsersTier=jdbcTemplate.queryForObject(tierSql,String.class,bojId);
+        Integer solvedCount=jdbcTemplate.queryForObject(countSql,Integer.class,bojId);
 
         assertThat(fetchUsersTier).isEqualTo(String.valueOf(newTier));
+        assertThat(solvedCount).isEqualTo(newSolvedCount);
     }
 }
