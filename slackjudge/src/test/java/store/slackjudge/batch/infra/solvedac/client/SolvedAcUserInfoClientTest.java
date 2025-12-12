@@ -11,8 +11,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import store.slackjudge.batch.infra.solvedac.SolvedAcProperties;
-import store.slackjudge.batch.infra.solvedac.dto.ProblemSearchResponse;
-import store.slackjudge.batch.infra.solvedac.dto.UserSearchResponse;
+import store.slackjudge.batch.infra.solvedac.dto.UserInfoResponse;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -21,7 +20,6 @@ import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -115,7 +113,7 @@ class SolvedAcUserInfoClientTest {
             );
 
             //when
-            UserSearchResponse response=client.parseResponse(json);
+            UserInfoResponse response=client.parseResponse(json);
 
             //then
             assertThat(response).isNotNull();
