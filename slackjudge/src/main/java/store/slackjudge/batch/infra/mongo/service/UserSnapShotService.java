@@ -73,6 +73,7 @@ public class UserSnapShotService {
     * @date 25. 12. 12.
     *
     ==========================**/
+    //TODO:user단위 트랜잭션 처리로 이 부분은 삭제해야 함.
     @Transactional(readOnly = true)
     public List<UserSolvedSnapShotDocument> findUsersAllPreviousSnapshot(List<String> bojIds,LocalDateTime snapshotAt){
         return bojIds
@@ -80,5 +81,10 @@ public class UserSnapShotService {
                 .map(b->repository.findByIdBojIdAndIdSnapShotAt(b,snapshotAt))
                 .flatMap(Optional::stream)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<UserSolvedSnapShotDocument> findUserPreviousSnapshot(String bojId,LocalDateTime snapshotAt){
+        return repository.findByIdBojIdAndIdSnapShotAt(bojId,snapshotAt);
     }
 }

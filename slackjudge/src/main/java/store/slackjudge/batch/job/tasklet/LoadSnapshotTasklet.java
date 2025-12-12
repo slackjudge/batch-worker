@@ -17,11 +17,15 @@ import store.slackjudge.batch.config.BatchLogger;
 import store.slackjudge.batch.config.TimeConfig;
 import store.slackjudge.batch.dto.UserInfo;
 import store.slackjudge.batch.infra.mongo.document.UserSolvedSnapShotDocument;
+import store.slackjudge.batch.infra.mongo.repository.UserSolvedSnapShotRepository;
 import store.slackjudge.batch.infra.mongo.service.UserSnapShotService;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * [ step 02 ]
@@ -34,7 +38,7 @@ public class LoadSnapshotTasklet implements Tasklet {
     /**
      * next step : FetchTierAndCountTasklet
      */
-    private final UserSnapShotService userSnapShotService;
+    private final UserSolvedSnapShotRepository repository;
     private final CalculateSnapShotDate snapShotDate;
     private final BatchLogger logger;
 
@@ -55,21 +59,25 @@ public class LoadSnapshotTasklet implements Tasklet {
         List<String> usersBojIds = users.stream()
                 .map(UserInfo::baekJoonId)
                 .toList();
+        Map<String, UserSolvedSnapShotDocument> mappingUsersSolvedSnapshots = new ConcurrentHashMap<>();
 
         //모든 유저의 스냅샷 조회
-        List<UserSolvedSnapShotDocument> userSolvedSnapShotDocuments
-                = userSnapShotService.findUsersAllPreviousSnapshot(usersBojIds,snapshotAt);
+        usersBojIds.forEach(bojId -> {
+            UserSolvedSnapShotDocument doc = repository.findByIdBojIdAndIdSnapShotAt(bojId, snapshotAt)
+                    .orElse(null); //1시간 전 스냅샷 없는 경우 null값 삽입 -> step3에서 null-safe 처리
+            mappingUsersSolvedSnapshots.put(bojId, doc);
+        });
 
         //종료 시간 - 시작 시간
-        long duration=System.currentTimeMillis()-startTime;
+        long duration = System.currentTimeMillis() - startTime;
 
         //현재 step에 대한 메타데이터 객체
-        ExecutionContext stepContext=this.stepExecution.getExecutionContext();
+        ExecutionContext stepContext = this.stepExecution.getExecutionContext();
 
         //{ snapshot : List<UserSolvedSnapShotDocument> } 데이터 저장
-        stepContext.put("snapshots",userSolvedSnapShotDocuments);
+        stepContext.put("snapshots", mappingUsersSolvedSnapshots);
 
-        logger.stepEnd("LoadSnapshotTasklet","usersSnapshotSize=",userSolvedSnapShotDocuments.size(),"duration=",duration);
+        logger.stepEnd("LoadSnapshotTasklet", "usersSnapshotSize=", mappingUsersSolvedSnapshots.size(), "duration=", duration);
 
         return RepeatStatus.FINISHED;
     }
@@ -77,7 +85,7 @@ public class LoadSnapshotTasklet implements Tasklet {
     //step 실행 전 Step Execution 가져오기
     @BeforeStep
     public void retrievePreviousStepData(StepExecution stepExecution) {
-        this.stepExecution=stepExecution;
+        this.stepExecution = stepExecution;
 
         final JobExecution jobExecution = stepExecution.getJobExecution();
         final ExecutionContext jobContext = jobExecution.getExecutionContext();

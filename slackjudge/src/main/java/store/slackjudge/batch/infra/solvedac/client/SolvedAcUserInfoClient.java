@@ -117,11 +117,11 @@ public class SolvedAcUserInfoClient extends AbstractSolvedAcApiClient<UserSearch
     ==========================**/
 
     //TODO:page 증가하면서 특정 유저 찾기 -> 배치 job에서 수행
-    /*public UserInfoResponse findExactUser(String bojId){
+    public UserInfoResponse findExactUser(String bojId){
         int page=0;
 
         while (true){
-            UserSearchResponse response=this.callWithPage(bojId,page);
+            UserSearchResponse response=this.call(bojId,page);
             log.info("[calling solved.ac API] call with page user response : {}",response);
             if (response.items()==null || response.items().isEmpty()) return null;
 
@@ -134,5 +134,5 @@ public class SolvedAcUserInfoClient extends AbstractSolvedAcApiClient<UserSearch
 
             page++;
         }
-    }*/
+    }
 }

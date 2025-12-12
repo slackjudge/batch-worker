@@ -58,7 +58,7 @@ public class LoadAllUsersTasklet implements Tasklet {
 
     //step 실행 전 Step Execution 가져오기
     @BeforeStep
-    public void saveStepExecution(StepExecution stepExecution){
+    public void beforeStepExecution(StepExecution stepExecution){
         this.stepExecution=stepExecution;
     }
 }
