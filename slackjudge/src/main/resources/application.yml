@@ -21,8 +21,9 @@ logging:
 
 solved:
   api:
-    user-info: https://solved.ac/api/v3/search/user
+    user-info: https://solved.ac/api/v3/user/show
     problem-info: https://solved.ac/api/v3/search/problem
+
 ---
 
 spring:

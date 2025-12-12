@@ -53,16 +53,16 @@ public class UserJdbcRepository {
     * @date 25. 12. 7.
     *
     ==========================**/
-    public void updateUsersTier(String bojId,int newTier){
+    public void updateUsersTier(String bojId,int newTier,int solvedCount){
         String sql= """
                 UPDATE
                     users
                 SET
-                    boj_tier = ?
+                    boj_tier = ?, total_solved_count = ?
                 WHERE
                     baekjoon_id = ?
                 """;
-        jdbcTemplate.update(sql,newTier,bojId);
+        jdbcTemplate.update(sql,newTier,solvedCount,bojId);
     }
 
 
