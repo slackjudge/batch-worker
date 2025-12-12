@@ -10,6 +10,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
 import store.slackjudge.batch.common.CalculateSnapShotDate;
 import store.slackjudge.batch.config.BatchLogger;
@@ -30,7 +31,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * [ step 02 ]
+ * [ step 03 ]
  * solved.ac 유저 정보 API 호출 tasklet (변경 감지는 해당 step에서 진행하지 않는다)
  */
 
@@ -39,10 +40,11 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class FetchSolvedAcUserInfoTasklet implements Tasklet {
     /**
-     * next step : FetchA
+     * next step : DetectAndUpdateUserTierAndProblemTasklet
      */
     private final BatchLogger logger;
     private final SolvedAcUserInfoClient userInfoClient;
+    private final RetryTemplate retryTemplate;
 
     private StepExecution stepExecution;
     private List<UserInfo> users;
@@ -58,7 +60,9 @@ public class FetchSolvedAcUserInfoTasklet implements Tasklet {
         for (UserInfo user : users) {
             try {
                 //solved.ac API에서 유저 정보 조회
-                UserInfoResponse solvedAcInfo = userInfoClient.findExactUser(user.baekJoonId());
+                UserInfoResponse solvedAcInfo = retryTemplate.execute(context ->
+                        userInfoClient.findExactUser(user.baekJoonId())
+                );
 
                 //다음 step으로 전달할 메타데이터 객체
                 userInfoResponseMap.put(user.baekJoonId(), solvedAcInfo);

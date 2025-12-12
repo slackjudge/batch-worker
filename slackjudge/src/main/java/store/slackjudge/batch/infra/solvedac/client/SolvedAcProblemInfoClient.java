@@ -102,12 +102,12 @@ public class SolvedAcProblemInfoClient extends AbstractSolvedAcApiClient<Problem
     }
 
      //TODO:page 증가하면서 모든 문제 찾기 -> 배치 job에서 수행
-    /*public List<Integer> fetchAllProblems(String bojId) {
+    public List<Integer> fetchAllProblems(String bojId) {
         List<Integer> allProblemIds = new ArrayList<>();
         int page = 1;
 
         while (true) {
-            ProblemSearchResponse response = this.callWithPage(bojId, page);
+            ProblemSearchResponse response = this.call(bojId, page);
             log.info("[calling solved.ac API] call with page problem response : {}", response);
             if (response.items() == null || response.items().isEmpty()) {
                 break;
@@ -124,5 +124,5 @@ public class SolvedAcProblemInfoClient extends AbstractSolvedAcApiClient<Problem
         }
 
         return allProblemIds;
-    }*/
+    }
 }

@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @RequiredArgsConstructor
-public class ProblemChangeDetector implements SnapshotDetectStrategy<ProblemSearchResponse> {
+public class ProblemChangeDetector implements SnapshotDetectStrategy<List<Integer>> {
     private final ProblemJdbcRepository repository;
 
     /*==========================
@@ -33,8 +33,8 @@ public class ProblemChangeDetector implements SnapshotDetectStrategy<ProblemSear
     *
     ==========================**/
     @Override
-    public boolean detect(DetectionContext<ProblemSearchResponse> context) {
-        return context.previous().getSolvedCount() != context.current().count();
+    public boolean detect(DetectionContext<List<Integer>> context) {
+        return context.previous().getSolvedCount() != context.current().size();
     }
 
     /*==========================
@@ -49,17 +49,13 @@ public class ProblemChangeDetector implements SnapshotDetectStrategy<ProblemSear
     *
     ==========================**/
     @Override
-    public void update(DetectionContext<ProblemSearchResponse> context) {
+    public void update(DetectionContext<List<Integer>> context) {
         //스냅샷에 존재하는 유저의 모든 문제 번호
         Set<Integer> previousProblemIds = context.previous().getSolvedProblemIds();
 
         //새로 조회한 유저의 모든 문제 번호
         Set<Integer> currentProblemIds =
-                context.current()
-                        .items()
-                        .stream()
-                        .map(ProblemInfoResponse::problemId)
-                        .collect(Collectors.toSet());
+                new HashSet<>(context.current());
 
         //새로 푼 문제 업데이트
         currentProblemIds.stream()
