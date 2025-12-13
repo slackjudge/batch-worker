@@ -22,7 +22,7 @@ public class UrlBuilder {
     ==========================**/
     public String buildUrl(String baseUrl, Map<String,String> params){
         String queryString = params.entrySet().stream()
-                .map(e-> e.getKey() + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8))
+                .map(e->e.getKey() + "="+e.getValue())
                 .collect(Collectors.joining("&"));
 
         return baseUrl+"?"+queryString;
