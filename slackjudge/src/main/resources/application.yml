@@ -24,6 +24,11 @@ solved:
     user-info: https://solved.ac/api/v3/user/show
     problem-info: https://solved.ac/api/v3/search/problem
 
+slack:
+  webhook:
+    url: ${SLACK_WEBHOOK_URL}
+  enabled: true
+
 ---
 
 spring:

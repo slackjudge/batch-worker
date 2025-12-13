@@ -46,6 +46,10 @@ dependencies {
     testImplementation "org.testcontainers:junit-jupiter" // JUnit 5 연동
 	testImplementation 'org.testcontainers:jdbc'
 	testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.11.0'
+
+	//Slack
+	implementation 'org.springframework.boot:spring-boot-starter-web:3.3.3'
+	implementation 'com.slack.api:slack-api-client:1.43.0'
 }
 
 tasks.named('test') {
