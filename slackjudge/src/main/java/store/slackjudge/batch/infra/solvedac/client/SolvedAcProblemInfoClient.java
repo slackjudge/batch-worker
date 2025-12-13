@@ -19,8 +19,9 @@ import java.util.*;
 public class SolvedAcProblemInfoClient extends AbstractSolvedAcApiClient<ProblemSearchResponse> {
     private final SolvedAcProperties properties;
     private final ObjectMapper objectMapper;
-    private final static int MAX_PAGE=689;
-    private final static int MIN_PAGE=1;
+    private final static int MAX_PAGE = 689;
+    private final static int MIN_PAGE = 1;
+    private final static int ITEMS_PER_PAGE = 50;
 
     protected SolvedAcProblemInfoClient(WebClient webClient, UrlBuilder urlBuilder, SolvedAcProperties properties, ObjectMapper objectMapper) {
         super(webClient, urlBuilder);
@@ -40,21 +41,21 @@ public class SolvedAcProblemInfoClient extends AbstractSolvedAcApiClient<Problem
     *
     ==========================**/
     @Override
-    protected Map<String, String> createRequestParameter(String bojId,int page) {
+    protected Map<String, String> createRequestParameter(String bojId, int page) {
         /**
          * 현재 존재하는 백준 문제 개수 : 34889
          * 최대 페이징 제한 : 689
          */
-        Map<String,String> params=new HashMap<>();
-        params.put("query","solved_by:"+bojId);
+        Map<String, String> params = new HashMap<>();
+        params.put("query", "solved_by:" + bojId);
 
-        if (page<MIN_PAGE || page>MAX_PAGE) {
-            log.warn("[invalid page value] max page value : {} min page value : {} now page value : {}",MAX_PAGE,MIN_PAGE,page);
-            params.put("page",String.valueOf(1));
+        if (page < MIN_PAGE || page > MAX_PAGE) {
+            log.warn("[invalid page value] max page value : {} min page value : {} now page value : {}", MAX_PAGE, MIN_PAGE, page);
+            params.put("page", String.valueOf(MIN_PAGE));
             return params;
         }
 
-        params.put("page",String.valueOf(page));
+        params.put("page", String.valueOf(page));
 
         return params;
     }
@@ -101,28 +102,67 @@ public class SolvedAcProblemInfoClient extends AbstractSolvedAcApiClient<Problem
         //TODO:에러 처리 구체화 진행 예정
     }
 
-     //TODO:page 증가하면서 모든 문제 찾기 -> 배치 job에서 수행
     public List<Integer> fetchAllProblems(String bojId) {
         List<Integer> allProblemIds = new ArrayList<>();
-        int page = 1;
 
-        while (true) {
-            ProblemSearchResponse response = this.call(bojId, page);
-            log.info("[calling solved.ac API] call with page problem response : {}", response);
-            if (response.items() == null || response.items().isEmpty()) {
-                break;
+        try {
+            //1.첫 번째 페이지로 전체 문제 개수 확인
+            ProblemSearchResponse firstResponse = this.call(bojId, 1);
+
+            if (firstResponse == null) {
+                log.warn("[fetchAllProblems] No response for user : {}", bojId);
+                return Collections.emptyList();
             }
-            log.info("[calling solved.ac API] fetch problemInfo api json parsing size : {}", response.items().size());
 
-            allProblemIds.addAll(
-                    response.items().stream()
-                            .map(ProblemInfoResponse::problemId)
-                            .toList()
-            );
+            int totalCount = firstResponse.count();
+            log.info("[fetchAllProblems] user : {}, total problems : {}", bojId, totalCount);
 
-            page++;
+            //푼 문제가 없는 경우
+            if (totalCount == 0) {
+                return Collections.emptyList();
+            }
+
+            //첫 번째 페이지 추가
+            if (firstResponse.items() != null && !firstResponse.items().isEmpty()) {
+                allProblemIds.addAll(
+                        firstResponse.items().stream()
+                                .map(ProblemInfoResponse::problemId)
+                                .toList()
+                );
+            }
+
+            //2.필요 페이지 계산
+            int totalPages = (int) Math.ceil((double) totalCount / ITEMS_PER_PAGE);
+            totalPages= Math.min(totalPages, MAX_PAGE);
+
+            //3. 나머지 페이지 조회
+            for (int page=2;page<=totalPages;page++){
+                ProblemSearchResponse response=this.call(bojId,page);
+
+                if (response==null || response.items()==null || response.items().isEmpty()){
+                    break;
+                }
+
+                allProblemIds.addAll(
+                        response.items().stream()
+                                .map(ProblemInfoResponse::problemId)
+                                .toList()
+                );
+
+                log.debug("[fetchAllProblems] Fetched page {}/{}",page,totalPages);
+            }
+
+            //4. 페이지 수 검증
+            if (allProblemIds.size()!=totalCount){
+                log.warn("[fetchAllProblems] size mismatch - user : {}, fetched : {}, expected : {}",
+                        bojId,allProblemIds.size(),totalCount
+                );
+            }
+
+            return allProblemIds;
+        }catch (Exception e){
+            log.error("[fetchAllProblems] failed to fetch problems for user : {}, error:{}",bojId,e.getMessage(),e);
+            return Collections.emptyList();
         }
-
-        return allProblemIds;
     }
 }
