@@ -1,4 +1,4 @@
-package store.slackjudge.batch.infra.mongo.service.detector;
+package store.slackjudge.batch.service;
 
 import lombok.Builder;
 import store.slackjudge.batch.infra.mongo.document.UserSolvedSnapShotDocument;

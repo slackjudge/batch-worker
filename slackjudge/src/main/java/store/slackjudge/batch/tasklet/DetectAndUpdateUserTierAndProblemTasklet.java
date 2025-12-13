@@ -14,9 +14,9 @@ import store.slackjudge.batch.config.BatchLogger;
 import store.slackjudge.batch.dto.UserInfo;
 import store.slackjudge.batch.infra.mongo.document.UserSolvedSnapShotDocument;
 import store.slackjudge.batch.infra.mongo.dto.SaveSnapshot;
-import store.slackjudge.batch.infra.mongo.service.detector.DetectionContext;
-import store.slackjudge.batch.infra.mongo.service.detector.ProblemChangeDetector;
-import store.slackjudge.batch.infra.mongo.service.detector.TierChangeDetector;
+import store.slackjudge.batch.service.DetectionContext;
+import store.slackjudge.batch.service.ProblemChangeDetector;
+import store.slackjudge.batch.service.TierChangeDetector;
 import store.slackjudge.batch.infra.solvedac.client.SolvedAcProblemInfoClient;
 import store.slackjudge.batch.infra.solvedac.dto.UserInfoResponse;
 

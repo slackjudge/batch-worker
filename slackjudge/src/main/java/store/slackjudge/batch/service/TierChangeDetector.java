@@ -1,8 +1,7 @@
-package store.slackjudge.batch.infra.mongo.service.detector;
+package store.slackjudge.batch.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import store.slackjudge.batch.infra.mongo.document.UserSolvedSnapShotDocument;
 import store.slackjudge.batch.infra.solvedac.dto.UserInfoResponse;
 import store.slackjudge.batch.repository.UserJdbcRepository;
 

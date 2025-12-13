@@ -1,6 +1,4 @@
-package store.slackjudge.batch.infra.mongo.service.detector;
-
-import store.slackjudge.batch.infra.mongo.document.UserSolvedSnapShotDocument;
+package store.slackjudge.batch.service;
 
 /**
  * strategy pattern 적용

@@ -1,18 +1,13 @@
-package store.slackjudge.batch.infra.mongo.service.detector;
+package store.slackjudge.batch.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import store.slackjudge.batch.infra.mongo.document.UserSolvedSnapShotDocument;
-import store.slackjudge.batch.infra.solvedac.dto.ProblemInfoResponse;
-import store.slackjudge.batch.infra.solvedac.dto.ProblemSearchResponse;
 import store.slackjudge.batch.repository.ProblemJdbcRepository;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /* [ 사용자가 푼 문제 감지 전략 ]
  * 변경 감지 전략 구현체
