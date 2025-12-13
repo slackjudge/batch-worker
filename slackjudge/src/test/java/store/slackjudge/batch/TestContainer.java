@@ -13,7 +13,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
         MongoAutoConfiguration.class,
         MongoDataAutoConfiguration.class
 })
-@SpringBootTest
 public class TestContainer {
     @Autowired
     private JdbcTemplate jdbcTemplate;

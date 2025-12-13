@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import store.slackjudge.batch.EnablePostgresTest;
+import store.slackjudge.batch.PostgresTestContainer;
 
 import java.time.LocalDateTime;
 
