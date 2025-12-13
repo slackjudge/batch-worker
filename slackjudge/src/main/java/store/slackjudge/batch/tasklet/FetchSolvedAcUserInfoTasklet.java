@@ -1,4 +1,4 @@
-package store.slackjudge.batch.job.tasklet;
+package store.slackjudge.batch.tasklet;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +17,7 @@ import store.slackjudge.batch.dto.UserInfo;
 import store.slackjudge.batch.infra.solvedac.client.SolvedAcUserInfoClient;
 import store.slackjudge.batch.infra.solvedac.dto.UserInfoResponse;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,8 +38,6 @@ public class FetchSolvedAcUserInfoTasklet implements Tasklet {
     private final SolvedAcUserInfoClient userInfoClient;
     private final RetryTemplate retryTemplate;
 
-    private StepExecution stepExecution;
-    private List<UserInfo> users;
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
@@ -46,13 +45,24 @@ public class FetchSolvedAcUserInfoTasklet implements Tasklet {
         //시작 시간
         long startTime = System.currentTimeMillis();
 
-        Map<String, UserInfoResponse> userInfoResponseMap = new ConcurrentHashMap<>();
+        StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
+        JobExecution jobExecution = stepExecution.getJobExecution();
+        ExecutionContext jobContext = jobExecution.getExecutionContext();
+
+        List<UserInfo> users = (List<UserInfo>) jobContext.get("users");
+        Map<String, UserInfoResponse> userInfoResponseMap = new HashMap<>();
+
+        //조회된 유저가 없는 경우 step 종료
+        if (users==null || users.isEmpty()){
+            logger.stepEnd("FetchSolvedAcUserInfoTasklet", "No users found");
+            return RepeatStatus.FINISHED;
+        }
 
         for (UserInfo user : users) {
             try {
                 //solved.ac API에서 유저 정보 조회 - RetryTemplate 재시도
                 UserInfoResponse solvedAcInfo = retryTemplate.execute(context ->
-                        userInfoClient.call(user.baekJoonId(),0)
+                        userInfoClient.call(user.baekJoonId(), 0)
                 );
 
                 //다음 step으로 전달할 메타데이터 객체
@@ -66,7 +76,7 @@ public class FetchSolvedAcUserInfoTasklet implements Tasklet {
         long duration = System.currentTimeMillis() - startTime;
 
         //현재 step 메타 데이터 객체
-        ExecutionContext stepContext = this.stepExecution.getExecutionContext();
+        ExecutionContext stepContext = stepExecution.getExecutionContext();
 
         //{ userSolvedInfo : Map<String, UserInfoResponse> }
         stepContext.put("userSolvedInfo", userInfoResponseMap);
@@ -78,15 +88,5 @@ public class FetchSolvedAcUserInfoTasklet implements Tasklet {
         );
 
         return RepeatStatus.FINISHED;
-    }
-
-    @BeforeStep
-    public void beforeStepExecution(StepExecution stepExecution) {
-        this.stepExecution = stepExecution;
-
-        final JobExecution jobExecution = stepExecution.getJobExecution();
-        final ExecutionContext jobContext = jobExecution.getExecutionContext();
-
-        this.users = (List<UserInfo>) jobContext.get("users");
     }
 }

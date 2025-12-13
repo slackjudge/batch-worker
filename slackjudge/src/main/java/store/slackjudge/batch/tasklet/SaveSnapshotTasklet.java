@@ -1,4 +1,4 @@
-package store.slackjudge.batch.job.tasklet;
+package store.slackjudge.batch.tasklet;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.JobExecution;
@@ -11,9 +11,11 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.stereotype.Component;
 import store.slackjudge.batch.config.BatchLogger;
+import store.slackjudge.batch.dto.UserInfo;
 import store.slackjudge.batch.infra.mongo.dto.SaveSnapshot;
 import store.slackjudge.batch.infra.mongo.service.UserSnapShotService;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,33 +29,32 @@ public class SaveSnapshotTasklet implements Tasklet {
     private final UserSnapShotService service;
     private final BatchLogger logger;
 
-    private StepExecution stepExecution;
-    private Map<String, SaveSnapshot> currentSnapshots;
-
-
     @Override
-    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext){
+    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
         logger.stepStart("SaveSnapshotTasklet");
 
         //시작 시간
-        long startTime=System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
+        StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
 
-        for (SaveSnapshot snapshot:currentSnapshots.values()){
+        // Job ExecutionContext에서 직접 가져오기
+        JobExecution jobExecution = stepExecution.getJobExecution();
+        ExecutionContext jobContext = jobExecution.getExecutionContext();
+
+        Map<String, SaveSnapshot> currentSnapshots = (Map<String, SaveSnapshot>) jobContext.get("currentSnapshot");
+
+        //새로 업데이트된 snapshot이 없다면 종료
+        if (currentSnapshots==null ||currentSnapshots.isEmpty()){
+            logger.stepEnd("SaveSnapshotTasklet","No current snapshots");
+            return RepeatStatus.FINISHED;
+        }
+        for (SaveSnapshot snapshot : currentSnapshots.values()) {
             service.saveSnapshot(snapshot);
         }
 
-        long duration=System.currentTimeMillis()-startTime;
-        logger.stepEnd("SaveSnapshotTasklet","duration=",duration);
+        long duration = System.currentTimeMillis() - startTime;
+        logger.stepEnd("SaveSnapshotTasklet", "duration=", duration);
         return RepeatStatus.FINISHED;
     }
 
-    @BeforeStep
-    public void retrievePreviousStepData(StepExecution stepExecution){
-        this.stepExecution=stepExecution;
-
-        final JobExecution jobExecution=stepExecution.getJobExecution();
-        final ExecutionContext jobContext=jobExecution.getExecutionContext();
-
-        this.currentSnapshots=(Map<String, SaveSnapshot>) jobContext.get("currentSnapshot");
-    }
 }

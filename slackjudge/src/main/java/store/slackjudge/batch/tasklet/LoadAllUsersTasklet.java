@@ -1,4 +1,4 @@
-package store.slackjudge.batch.job.tasklet;
+package store.slackjudge.batch.tasklet;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,10 +32,10 @@ public class LoadAllUsersTasklet implements Tasklet {
      * next step : LoadSnapshotTasklet
      */
 
-    private StepExecution stepExecution;
-
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext){
+        StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
+
         logger.stepStart("LoadAllUsersTasklet");
         //시작 시간
         long startTime=System.currentTimeMillis();
@@ -47,18 +47,12 @@ public class LoadAllUsersTasklet implements Tasklet {
         long duration=System.currentTimeMillis()-startTime;
 
         //햔재 step에 대한 메타데이터 객체
-        ExecutionContext stepContext=this.stepExecution.getExecutionContext();
+        ExecutionContext stepContext=stepExecution.getExecutionContext();
         //{ users : List<UserInfo> } 형태로 메타데이터 저장
         stepContext.put("users",users);
 
         logger.stepEnd("LoadAllUsersTasklet","usersSize="+users.size(),"duration="+duration);
 
         return RepeatStatus.FINISHED;
-    }
-
-    //step 실행 전 Step Execution 가져오기
-    @BeforeStep
-    public void beforeStepExecution(StepExecution stepExecution){
-        this.stepExecution=stepExecution;
     }
 }
