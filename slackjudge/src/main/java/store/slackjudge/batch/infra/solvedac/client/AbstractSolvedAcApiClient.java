@@ -2,8 +2,10 @@ package store.slackjudge.batch.infra.solvedac.client;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.util.retry.Retry;
 import store.slackjudge.batch.infra.solvedac.util.UrlBuilder;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -16,7 +18,11 @@ import java.util.function.Supplier;
 @Slf4j
 public abstract class AbstractSolvedAcApiClient<T> {
     //재시도 횟수
-    private final int RETRY = 5;
+    private static final int RETRY = 3;
+    //재시도 딜레이
+    private static final Duration RETRY_DELAY = Duration.ofSeconds(1);
+    //재시도 타임 아웃
+    private static final Duration TIMEOUT = Duration.ofSeconds(10);
 
 
     private final WebClient webClient;
@@ -29,7 +35,7 @@ public abstract class AbstractSolvedAcApiClient<T> {
     }
 
     //API별 요청 파라미터 생성
-    protected abstract Map<String, String> createRequestParameter(String bojId,int page);
+    protected abstract Map<String, String> createRequestParameter(String bojId, int page);
 
     //API별 URL 설정
     protected abstract String setUpUrl();
@@ -39,11 +45,22 @@ public abstract class AbstractSolvedAcApiClient<T> {
 
     //API 호출
     protected String request(String url) {
-        return webClient.get()
-                .uri(url)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+        try {
+            return webClient.get()
+                    .uri(url)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .timeout(TIMEOUT)
+                    .retryWhen(Retry.fixedDelay(RETRY, RETRY_DELAY)
+                            .doBeforeRetry(signal ->
+                                    log.warn("[solved.ac API] Retry {}/{} for URL: {}",
+                                            signal.totalRetries() + 1, RETRY, url)))
+                    .block();
+        } catch (Exception e) {
+            log.error("[solved.ac API] Request failed after {} retries for URL: {}, error: {}",
+                    RETRY, url, e.getMessage());
+            return null; // 배치 중단 방지
+        }
     }
 
     //재시도
@@ -75,13 +92,20 @@ public abstract class AbstractSolvedAcApiClient<T> {
     //요청
     public final T call(String bojId, int page) {
         String baseUrl = setUpUrl();
-        Map<String, String> params = new HashMap<>(createRequestParameter(bojId,page));
+        Map<String, String> params = new HashMap<>(createRequestParameter(bojId, page));
         String url = urlBuilder.buildUrl(baseUrl, params);
 
+        String response = request(url);
+        if (response == null) {
+            log.warn("[solved.ac API] Skipping bojId: {}, page: {} due to API failure", bojId, page);
+            return null;
+        }
+
         try {
-            return retry(() -> parseResponse(request(url)));
+            return parseResponse(response);
         } catch (Exception e) {
-            throw e;
+            log.error("[solved.ac API] Parse failed for bojId: {}, page: {}", bojId, page, e);
+            return null;
         }
     }
 
