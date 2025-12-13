@@ -20,6 +20,7 @@ public class PostgresTestContainer {
                     .withDatabaseName("testdb")
                     .withUsername("test")
                     .withPassword("pwd")
+                    .withReuse(false)
                     .withInitScript("init_schema.sql");
 
     static {
