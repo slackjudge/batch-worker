@@ -104,4 +104,9 @@ public class BatchLogger {
     public void userError(Long userId, String bojId, String message, Throwable e) {
         log.error("[ERROR][USER:{}][BOJ:{}] {}", userId, bojId, message, e);
     }
+
+    /** 유저 단위 INFO */
+    public void userInfo(Long userId,String bojId,String message){
+        log.info("[INFO][USER:{}][BOJ:{}] {}", userId, bojId, message);
+    }
 }
