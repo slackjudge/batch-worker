@@ -1,44 +1,166 @@
 package store.slackjudge.batch.config;
 
-import org.springframework.batch.core.configuration.support.DefaultBatchConfiguration;
-import org.springframework.boot.autoconfigure.batch.BatchDataSource;
+import lombok.RequiredArgsConstructor;
+import org.springframework.batch.core.*;
+import org.springframework.batch.core.listener.ExecutionContextPromotionListener;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.retry.backoff.FixedBackOffPolicy;
-import org.springframework.retry.policy.SimpleRetryPolicy;
-import org.springframework.retry.support.RetryTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
+import store.slackjudge.batch.tasklet.*;
 
-import javax.sql.DataSource;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
-public class BatchConfig extends DefaultBatchConfiguration {
-    private final DataSource dataSource;
+@RequiredArgsConstructor
+public class BatchConfig {
 
-    public BatchConfig(DataSource dataSource) {
-        this.dataSource = dataSource;
+    private final LoadAllUsersTasklet loadAllUsersTasklet;
+    private final LoadSnapshotTasklet loadSnapshotTasklet;
+    private final FetchSolvedAcUserInfoTasklet fetchSolvedAcUserInfoTasklet;
+    private final DetectAndUpdateUserTierAndProblemTasklet detectAndUpdateUserTierAndProblemTasklet;
+    private final SaveSnapshotTasklet saveSnapshotTasklet;
+
+    private final BatchLogger logger;
+
+    @Bean
+    public JobParametersIncrementer dateTimeIncrementer() {
+        return parameters -> {
+            Map<String, JobParameter<?>> map = new HashMap<>(parameters.getParameters());
+            map.put("snapshotAt",
+                    new JobParameter<>(LocalDateTime.now().toString(), String.class));
+            return new JobParameters(map);
+        };
+    }
+
+    /* ===========================================
+     *  Job 정의
+     * =========================================== */
+    @Bean
+    public Job slackJudgeBatch(
+            JobRepository jobRepository,
+            Step loadAllUsersStep,
+            Step loadSnapshotStep,
+            Step fetchSolvedAcUserInfoStep,
+            Step detectAndUpdateUserTierAndProblemStep,
+            Step saveSnapshotStep
+    ) {
+        logger.jobStart("slackJudge");
+
+        return new JobBuilder("slackJudge", jobRepository)
+                .incrementer(dateTimeIncrementer())
+                .start(loadAllUsersStep)
+                .next(loadSnapshotStep)
+                .next(fetchSolvedAcUserInfoStep)
+                .next(detectAndUpdateUserTierAndProblemStep)
+                .next(saveSnapshotStep)
+                .build();
+    }
+
+
+    /* ===========================================
+     *  Step01: RDB에서 유저 조회
+     * =========================================== */
+    @Bean
+    public Step loadAllUsersStep(
+            JobRepository jobRepository,
+            PlatformTransactionManager transactionManager
+    ) {
+        return new StepBuilder("LoadAllUsersStep", jobRepository)
+                .tasklet(loadAllUsersTasklet, transactionManager)
+                .listener(promoteUsers())
+                .build();
     }
 
     @Bean
-    public PlatformTransactionManager transactionManager(){
-        return new DataSourceTransactionManager(dataSource);
+    public ExecutionContextPromotionListener promoteUsers() {
+        ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
+        listener.setKeys(new String[]{"users"});
+        return listener;
+    }
+
+
+    /* ===========================================
+     *  Step02: Mongo Snapshot 조회
+     * =========================================== */
+    @Bean
+    public Step loadSnapshotStep(
+            JobRepository jobRepository,
+            PlatformTransactionManager transactionManager
+    ) {
+        return new StepBuilder("LoadSnapshotStep", jobRepository)
+                .tasklet(loadSnapshotTasklet, transactionManager)
+                .listener(promoteSnapshots())
+                .build();
     }
 
     @Bean
-    public RetryTemplate retryTemplate(){
-        RetryTemplate retryTemplate=new RetryTemplate();
-
-        //최대 3회 재시도
-        SimpleRetryPolicy retryPolicy=new SimpleRetryPolicy(3);
-
-        //재시도 간격 0.5초
-        FixedBackOffPolicy backOffPolicy=new FixedBackOffPolicy();
-        backOffPolicy.setBackOffPeriod(500);
-
-        retryTemplate.setRetryPolicy(retryPolicy);
-        retryTemplate.setBackOffPolicy(backOffPolicy);
-
-        return retryTemplate;
+    public ExecutionContextPromotionListener promoteSnapshots() {
+        ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
+        listener.setKeys(new String[]{"snapshots"});
+        return listener;
     }
+
+
+    /* ===========================================
+     *  Step03: solved.ac 유저 정보 조회
+     * =========================================== */
+    @Bean
+    public Step fetchSolvedAcUserInfoStep(
+            JobRepository jobRepository,
+            PlatformTransactionManager transactionManager
+    ) {
+        return new StepBuilder("FetchSolvedAcUserInfoStep", jobRepository)
+                .tasklet(fetchSolvedAcUserInfoTasklet, transactionManager)
+                .listener(promoteUserSolvedInfo())
+                .build();
+    }
+
+    @Bean
+    public ExecutionContextPromotionListener promoteUserSolvedInfo() {
+        ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
+        listener.setKeys(new String[]{"userSolvedInfo"});
+        return listener;
+    }
+
+
+    /* ===========================================
+     *  Step04: 변경 감지
+     * =========================================== */
+    @Bean
+    public Step detectAndUpdateUserTierAndProblemStep(
+            JobRepository jobRepository,
+            PlatformTransactionManager transactionManager
+    ) {
+        return new StepBuilder("detectAndUpdateUserTierAndProblemStep", jobRepository)
+                .tasklet(detectAndUpdateUserTierAndProblemTasklet, transactionManager)
+                .listener(promoteCurrentSnapshot())
+                .build();
+    }
+
+    @Bean
+    public ExecutionContextPromotionListener promoteCurrentSnapshot() {
+        ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
+        listener.setKeys(new String[]{"currentSnapshot"});
+        return listener;
+    }
+
+
+    /* ===========================================
+     *  Step05: Snapshot 저장
+     * =========================================== */
+    @Bean
+    public Step saveSnapshotStep(
+            JobRepository jobRepository,
+            PlatformTransactionManager transactionManager
+    ) {
+        return new StepBuilder("saveSnapshotStep", jobRepository)
+                .tasklet(saveSnapshotTasklet, transactionManager)
+                .build();
+    }
+
 }
