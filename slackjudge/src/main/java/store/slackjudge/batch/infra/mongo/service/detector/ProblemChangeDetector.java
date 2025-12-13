@@ -7,6 +7,7 @@ import store.slackjudge.batch.infra.solvedac.dto.ProblemInfoResponse;
 import store.slackjudge.batch.infra.solvedac.dto.ProblemSearchResponse;
 import store.slackjudge.batch.repository.ProblemJdbcRepository;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -64,5 +65,22 @@ public class ProblemChangeDetector implements SnapshotDetectStrategy<List<Intege
                 .forEach(pid -> {
                     repository.updateProblemSolved(context.snapshotAt(), context.userId(), pid);
                 });
+    }
+
+      /*==========================
+    *
+    *ProblemChangeDetector
+    * 신규 유저의 문제를 데이터베이스에 저장
+    * @param snapshotAt: 스냅샷 시각
+    * @param userId: 유저 ID
+    * @param problemId: 문제 번호
+    * @return void
+    * @author kimdoyeon
+    * @version 1.0.0
+    * @date 25. 12. 13.
+    *
+    ==========================**/
+    public void saveNewProblem(LocalDateTime snapshotAt, Long userId, List<Integer>problemIds) {
+        repository.batchInsertProblems(snapshotAt, userId, problemIds);
     }
 }
