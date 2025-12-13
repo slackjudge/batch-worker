@@ -97,10 +97,7 @@ public class SolvedAcProblemInfoClient extends AbstractSolvedAcApiClient<Problem
         }
     }
 
-    @Override
-    protected void handleError(Exception e) {
-        //TODO:에러 처리 구체화 진행 예정
-    }
+
 
     public List<Integer> fetchAllProblems(String bojId) {
         List<Integer> allProblemIds = new ArrayList<>();

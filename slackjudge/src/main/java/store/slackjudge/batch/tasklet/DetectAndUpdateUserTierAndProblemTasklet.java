@@ -8,6 +8,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
 import store.slackjudge.batch.common.CalculateSnapShotDate;
 import store.slackjudge.batch.config.BatchLogger;
@@ -36,6 +37,7 @@ public class DetectAndUpdateUserTierAndProblemTasklet implements Tasklet {
     private final SolvedAcProblemInfoClient problemInfoClient;
     private final CalculateSnapShotDate calculateSnapShotDate;
     private final BatchLogger logger;
+    private final RetryTemplate retryTemplate;
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
@@ -69,8 +71,8 @@ public class DetectAndUpdateUserTierAndProblemTasklet implements Tasklet {
         // 3. 통계 변수 초기화
         int countOfUpdated = 0;
         int countOfNewUsers = 0;
-        int countOfSkipped = 0;
         int totalOfUser = users.size();
+        int failed = 0;
 
         LocalDateTime snapshotAt = calculateSnapShotDate.currentHour();
         Map<String, SaveSnapshot> currentSnapshots = new HashMap<>();
@@ -81,7 +83,7 @@ public class DetectAndUpdateUserTierAndProblemTasklet implements Tasklet {
 
             // 4-1. solved.ac 통신 실패한 유저는 스킵
             if (!userInfoResponses.containsKey(bojId)) {
-                countOfSkipped++;
+                failed++;
                 logger.taskletWarn("Skipped user due to no solved.ac info: " + bojId);
                 continue;
             }
@@ -91,24 +93,35 @@ public class DetectAndUpdateUserTierAndProblemTasklet implements Tasklet {
 
             // 4-2. 신규 유저 처리
             if (previousSnapshot == null) {
-                List<Integer> allProblems = problemInfoClient.fetchAllProblems(bojId);
-                Set<Integer> problemSet = new HashSet<>(allProblems);
-                logger.userInfo(user.userId(),user.baekJoonId(), allProblems.toString());
+                Set<Integer> problemSet = new HashSet<>();
+                List<Integer> allProblems = new ArrayList<>();
+                //재시도 로직 실행
+                try {
+                    allProblems = retryTemplate.execute(context ->
+                            problemInfoClient.fetchAllProblems(bojId)
+                    );
+
+                    problemSet = new HashSet<>(allProblems);
+                    logger.userInfo(user.userId(), user.baekJoonId(), allProblems.toString());
+                } catch (Exception e) {
+                    //실패
+                    logger.userWarn(user.userId(), user.baekJoonId(), e.getMessage());
+                }
 
                 logger.userInfo(user.userId(), user.baekJoonId(), "New user");
 
                 DetectionContext<UserInfoResponse> tierContext = DetectionContext.<UserInfoResponse>builder()
-                    .snapshotAt(snapshotAt)
-                    .current(currentUserInfo)
-                    .bojId(bojId)
-                    .userId(user.userId())
-                    .build();
+                        .snapshotAt(snapshotAt)
+                        .current(currentUserInfo)
+                        .bojId(bojId)
+                        .userId(user.userId())
+                        .build();
                 tierChangeDetector.update(tierContext);
 
                 logger.userInfo(user.userId(), user.baekJoonId(),
                         "New User Tier updated : " + tierContext.current().tier());
 
-                problemChangeDetector.saveNewProblem(snapshotAt,user.userId(),allProblems);
+                problemChangeDetector.saveNewProblem(snapshotAt, user.userId(), allProblems);
                 logger.userInfo(user.userId(), user.baekJoonId(),
                         "New User Problems updated : " + allProblems.size());
 
@@ -152,20 +165,27 @@ public class DetectAndUpdateUserTierAndProblemTasklet implements Tasklet {
             int currentSolvedCount = currentUserInfo.solvedCount();
 
             if (currentSolvedCount != previousSolvedCount) {
-                List<Integer> fetchedProblems = problemInfoClient.fetchAllProblems(bojId);
-                currentProblems = new HashSet<>(fetchedProblems);
+                try {
+                    //재시도 로직
+                    List<Integer> fetchedProblems = retryTemplate.execute((context) ->
+                            problemInfoClient.fetchAllProblems(bojId));
 
-                DetectionContext<List<Integer>> problemContext = DetectionContext.<List<Integer>>builder()
-                        .userId(user.userId())
-                        .snapshotAt(snapshotAt)
-                        .previous(previousSnapshot)
-                        .current(fetchedProblems)
-                        .bojId(bojId)
-                        .build();
+                    currentProblems = new HashSet<>(fetchedProblems);
 
-                if (!problemChangeDetector.detect(problemContext)) {
-                    hasChanges = true;
-                    problemChangeDetector.update(problemContext);
+                    DetectionContext<List<Integer>> problemContext = DetectionContext.<List<Integer>>builder()
+                            .userId(user.userId())
+                            .snapshotAt(snapshotAt)
+                            .previous(previousSnapshot)
+                            .current(fetchedProblems)
+                            .bojId(bojId)
+                            .build();
+
+                    if (!problemChangeDetector.detect(problemContext)) {
+                        hasChanges = true;
+                        problemChangeDetector.update(problemContext);
+                    }
+                } catch (Exception e) {
+                    logger.userWarn(user.userId(), user.baekJoonId(), e.getMessage());
                 }
             }
 
@@ -191,13 +211,18 @@ public class DetectAndUpdateUserTierAndProblemTasklet implements Tasklet {
         ExecutionContext stepContext = stepExecution.getExecutionContext();
         stepContext.put("currentSnapshot", currentSnapshots);
 
+        jobContext.putInt("TOTAL_USERS", totalOfUser);
+        jobContext.putInt("UPDATED_USERS", countOfUpdated);
+        jobContext.putInt("NEW_USERS", countOfNewUsers);
+        jobContext.putInt("FAILED_USERS", failed);
+
         // 6. 처리 결과 로깅
         long duration = System.currentTimeMillis() - startTime;
         logger.stepEnd(
                 "DetectAndUpdateUserTierAndProblemTasklet",
                 "new=" + countOfNewUsers,
                 "updated=" + countOfUpdated,
-                "skipped=" + countOfSkipped,
+                "failed=" + failed,
                 "total=" + totalOfUser,
                 "duration=" + duration
         );

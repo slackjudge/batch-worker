@@ -37,9 +37,6 @@ public abstract class AbstractSolvedAcApiClient<T> {
     //API별 응답 파싱
     protected abstract T parseResponse(String response);
 
-    //API별 에러 처리
-    protected abstract void handleError(Exception e);
-
     //API 호출
     protected String request(String url) {
         return webClient.get()
@@ -84,7 +81,6 @@ public abstract class AbstractSolvedAcApiClient<T> {
         try {
             return retry(() -> parseResponse(request(url)));
         } catch (Exception e) {
-            handleError(e);
             throw e;
         }
     }

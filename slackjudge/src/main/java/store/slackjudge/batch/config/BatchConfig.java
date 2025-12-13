@@ -24,6 +24,7 @@ public class BatchConfig {
     private final FetchSolvedAcUserInfoTasklet fetchSolvedAcUserInfoTasklet;
     private final DetectAndUpdateUserTierAndProblemTasklet detectAndUpdateUserTierAndProblemTasklet;
     private final SaveSnapshotTasklet saveSnapshotTasklet;
+    private final BatchJobListener jobListener;
 
     private final BatchLogger logger;
 
@@ -49,10 +50,9 @@ public class BatchConfig {
             Step detectAndUpdateUserTierAndProblemStep,
             Step saveSnapshotStep
     ) {
-        logger.jobStart("slackJudge");
-
         return new JobBuilder("slackJudge", jobRepository)
                 .incrementer(dateTimeIncrementer())
+                .listener(jobListener)
                 .start(loadAllUsersStep)
                 .next(loadSnapshotStep)
                 .next(fetchSolvedAcUserInfoStep)

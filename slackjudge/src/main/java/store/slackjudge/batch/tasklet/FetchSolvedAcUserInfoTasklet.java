@@ -53,7 +53,7 @@ public class FetchSolvedAcUserInfoTasklet implements Tasklet {
         Map<String, UserInfoResponse> userInfoResponseMap = new HashMap<>();
 
         //조회된 유저가 없는 경우 step 종료
-        if (users==null || users.isEmpty()){
+        if (users == null || users.isEmpty()) {
             logger.stepEnd("FetchSolvedAcUserInfoTasklet", "No users found");
             return RepeatStatus.FINISHED;
         }
