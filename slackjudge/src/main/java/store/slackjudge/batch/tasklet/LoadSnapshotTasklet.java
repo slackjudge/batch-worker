@@ -10,6 +10,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.messaging.Task;
 import org.springframework.stereotype.Component;
 import store.slackjudge.batch.common.CalculateSnapShotDate;
@@ -42,6 +43,8 @@ public class LoadSnapshotTasklet implements Tasklet {
     private final CalculateSnapShotDate snapShotDate;
     private final BatchLogger logger;
 
+    @Value("#{jobParameters['batchTime']}") LocalDateTime batchTime;
+
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
@@ -63,7 +66,7 @@ public class LoadSnapshotTasklet implements Tasklet {
         }
 
         //스냅샷 기준 조회
-        LocalDateTime snapshotAt = snapShotDate.snapshotDate();
+        LocalDateTime snapshotAt = snapShotDate.snapshotDate(batchTime);
 
         //모든 유저의 bojIds 리스트
         List<String> usersBojIds = users.stream()

@@ -8,6 +8,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
 import store.slackjudge.batch.common.CalculateSnapShotDate;
@@ -38,6 +39,9 @@ public class DetectAndUpdateUserTierAndProblemTasklet implements Tasklet {
     private final CalculateSnapShotDate calculateSnapShotDate;
     private final BatchLogger logger;
     private final RetryTemplate retryTemplate;
+
+    @Value("#{jobParameters['batchTime']}") LocalDateTime batchTime;
+
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
@@ -74,7 +78,7 @@ public class DetectAndUpdateUserTierAndProblemTasklet implements Tasklet {
         int totalOfUser = users.size();
         int failed = 0;
 
-        LocalDateTime snapshotAt = calculateSnapShotDate.currentHour();
+        LocalDateTime snapshotAt = calculateSnapShotDate.currentHour(batchTime);
         Map<String, SaveSnapshot> currentSnapshots = new HashMap<>();
 
         // 4. 유저별 처리
