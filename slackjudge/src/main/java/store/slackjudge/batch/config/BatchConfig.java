@@ -28,15 +28,6 @@ public class BatchConfig {
 
     private final BatchLogger logger;
 
-    @Bean
-    public JobParametersIncrementer dateTimeIncrementer() {
-        return parameters -> {
-            Map<String, JobParameter<?>> map = new HashMap<>(parameters.getParameters());
-            map.put("snapshotAt",
-                    new JobParameter<>(LocalDateTime.now().toString(), String.class));
-            return new JobParameters(map);
-        };
-    }
 
     /* ===========================================
      *  Job 정의
@@ -51,7 +42,6 @@ public class BatchConfig {
             Step saveSnapshotStep
     ) {
         return new JobBuilder("slackJudge", jobRepository)
-                .incrementer(dateTimeIncrementer())
                 .listener(jobListener)
                 .start(loadAllUsersStep)
                 .next(loadSnapshotStep)

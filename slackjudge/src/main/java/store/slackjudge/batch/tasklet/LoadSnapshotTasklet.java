@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 
 @Component
-@RequiredArgsConstructor
+
 public class LoadSnapshotTasklet implements Tasklet {
     /**
      * next step : FetchTierAndCountTasklet
@@ -42,8 +42,19 @@ public class LoadSnapshotTasklet implements Tasklet {
     private final UserSolvedSnapShotRepository repository;
     private final CalculateSnapShotDate snapShotDate;
     private final BatchLogger logger;
+    private final LocalDateTime batchTime;
 
-    @Value("#{jobParameters['batchTime']}") LocalDateTime batchTime;
+    public LoadSnapshotTasklet(
+            UserSolvedSnapShotRepository repository,
+            CalculateSnapShotDate snapShotDate,
+            BatchLogger logger,
+            @Value("#{jobParameters['batchTime']}") LocalDateTime batchTime)
+    {
+        this.repository = repository;
+        this.snapShotDate = snapShotDate;
+        this.logger = logger;
+        this.batchTime = batchTime;
+    }
 
 
     @Override

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
@@ -30,7 +31,7 @@ import java.util.*;
  * solved.ac 유저 / 푼 문제 수 변경 감지 및 업데이트 tasklet
  */
 @Component
-@RequiredArgsConstructor
+@StepScope
 public class DetectAndUpdateUserTierAndProblemTasklet implements Tasklet {
 
     private final ProblemChangeDetector problemChangeDetector;
@@ -39,8 +40,25 @@ public class DetectAndUpdateUserTierAndProblemTasklet implements Tasklet {
     private final CalculateSnapShotDate calculateSnapShotDate;
     private final BatchLogger logger;
     private final RetryTemplate retryTemplate;
+    private final LocalDateTime batchTime;
 
-    @Value("#{jobParameters['batchTime']}") LocalDateTime batchTime;
+    public DetectAndUpdateUserTierAndProblemTasklet(
+            ProblemChangeDetector problemChangeDetector,
+            TierChangeDetector tierChangeDetector,
+            SolvedAcProblemInfoClient problemInfoClient,
+            CalculateSnapShotDate calculateSnapShotDate,
+            BatchLogger logger,
+            RetryTemplate retryTemplate,
+            @Value("#{jobParameters['batchTime']}") LocalDateTime batchTime
+    ) {
+        this.problemChangeDetector = problemChangeDetector;
+        this.tierChangeDetector = tierChangeDetector;
+        this.problemInfoClient = problemInfoClient;
+        this.calculateSnapShotDate = calculateSnapShotDate;
+        this.logger = logger;
+        this.retryTemplate = retryTemplate;
+        this.batchTime = batchTime;
+    }
 
 
     @Override
