@@ -28,7 +28,12 @@ slack:
   webhook:
     url: ${SLACK_WEBHOOK_URL}
   enabled: true
-
+  color:
+    green: '#36a64f'
+    red: '#ff0000'
+    white: '#fffff'
+    yellow: '#ffcc00'
+    gray: '#91908d'
 ---
 
 spring:
