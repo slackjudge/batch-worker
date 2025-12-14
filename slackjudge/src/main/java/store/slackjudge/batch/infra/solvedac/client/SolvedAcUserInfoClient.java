@@ -88,8 +88,4 @@ public class SolvedAcUserInfoClient extends AbstractSolvedAcApiClient<UserInfoRe
     }
 
 
-    @Override
-    protected void handleError(Exception e) {
-        //TODO:에러 처리 구체화 진행 예정
-    }
 }

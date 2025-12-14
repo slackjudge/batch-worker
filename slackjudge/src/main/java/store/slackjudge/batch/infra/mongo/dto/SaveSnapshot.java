@@ -2,6 +2,7 @@ package store.slackjudge.batch.infra.mongo.dto;
 
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -16,5 +17,5 @@ public record SaveSnapshot(
     Integer tier,
     Long userId,
     Integer rating
-) {
+) implements Serializable {
 }

@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -25,16 +26,31 @@ public class ProblemJdbcRepository {
     * @date 25. 12. 8.
     *
     ==========================**/
-    public void updateProblemSolved(LocalDateTime batchTime,Long userId,Integer problemNumber){
-        String sql= """
-                INSERT INTO
-                    users_problem (user_id,problem_id,is_solved, solved_time)
-                VALUES
-                    (?, ?, true, ?)
-                ON CONFLICT
-                    (user_id, problem_id)
-                DO UPDATE SET solved_time = EXCLUDED.solved_time
+    public void updateProblemSolved(LocalDateTime batchTime, Long userId, Integer problemNumber){
+        String sql = """
+                INSERT INTO users_problem (user_id, problem_id, is_solved, solved_time)
+                VALUES (?, ?, true, ?)
+                ON CONFLICT (user_id, problem_id)
+                DO UPDATE SET
+                    solved_time = EXCLUDED.solved_time,
+                    is_solved = EXCLUDED.is_solved
                 """;
-        jdbcTemplate.update(sql,userId,problemNumber,batchTime);
+
+        jdbcTemplate.update(sql, userId, problemNumber, batchTime);
+    }
+
+    public void batchInsertProblems(LocalDateTime snapshotAt, Long userId, List<Integer> problemIds) {
+        String sql = """
+            INSERT INTO users_problem (user_id, problem_id, is_solved, solved_time)
+            VALUES (?, ?, true, ?)
+            ON CONFLICT (user_id, problem_id) DO NOTHING
+            """;
+
+    jdbcTemplate.batchUpdate(sql, problemIds, problemIds.size(),
+        (ps, problemId) -> {
+            ps.setLong(1, userId);
+            ps.setInt(2, problemId);
+            ps.setTimestamp(3, java.sql.Timestamp.valueOf(snapshotAt));
+        });
     }
 }

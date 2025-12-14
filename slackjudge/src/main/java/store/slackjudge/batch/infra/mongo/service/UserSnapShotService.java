@@ -9,6 +9,7 @@ import store.slackjudge.batch.infra.mongo.dto.SaveSnapshot;
 import store.slackjudge.batch.infra.mongo.repository.UserSolvedSnapShotRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**

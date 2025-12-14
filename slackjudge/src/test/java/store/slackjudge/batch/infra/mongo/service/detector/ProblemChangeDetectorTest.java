@@ -1,18 +1,18 @@
 package store.slackjudge.batch.infra.mongo.service.detector;
 
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import store.slackjudge.batch.infra.mongo.document.UserSolvedSnapShotDocument;
 import store.slackjudge.batch.infra.solvedac.dto.ProblemInfoResponse;
 import store.slackjudge.batch.infra.solvedac.dto.ProblemSearchResponse;
 import store.slackjudge.batch.repository.ProblemJdbcRepository;
+import store.slackjudge.batch.service.DetectionContext;
+import store.slackjudge.batch.service.ProblemChangeDetector;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

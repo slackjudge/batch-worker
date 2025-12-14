@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class SlackjudgeApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SlackjudgeApplication.class, args);
+		SpringApplication.exit(SpringApplication.run(SlackjudgeApplication.class, args));
 	}
 
 }
