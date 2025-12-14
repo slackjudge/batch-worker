@@ -43,6 +43,6 @@ public class TierChangeDetector implements SnapshotDetectStrategy<UserInfoRespon
     ==========================**/
     @Override
     public void update(DetectionContext<UserInfoResponse> context) {
-        userRepository.updateUsersTier(context.current().handle(),context.current().tier());
+        userRepository.updateUsersTier(context.current().handle(),context.current().tier(),context.current().solvedCount());
     }
 }
