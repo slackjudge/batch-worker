@@ -9,6 +9,7 @@ public record BatchEndMessageSpec(
     int newUsers,
     int updatedUsers,
     int failedUsers,
-    LocalDateTime time
+    LocalDateTime time,
+    String reason
 ) {
 }

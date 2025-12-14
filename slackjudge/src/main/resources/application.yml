@@ -33,7 +33,7 @@ slack:
     red: '#ff0000'
     white: '#fffff'
     yellow: '#ffcc00'
-    gray: '#91908d'
+    blue: '#0070ce'
 ---
 
 spring:

@@ -4,8 +4,8 @@ import com.slack.api.model.Attachment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import store.slackjudge.batch.infra.slack.logging.LogEventMessageSpec;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -15,26 +15,43 @@ import java.util.List;
 @RequiredArgsConstructor
 @Component
 public class SlackMessageFactory {
-    private static final DateTimeFormatter FORMATTER= DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final SlackTextLayout layout;
 
-    public String batchStart(BatchStartMessageSpec spec){
-        return layout.render(
+    @Value("${slack.color.green}")
+    private String GREEN;
+
+    @Value("${slack.color.blue}")
+    private String BLUE;
+
+    @Value("${slack.color.yellow}")
+    private String YELLOW;
+
+    @Value("${slack.color.red}")
+    private String RED;
+
+    public Attachment batchStart(BatchStartMessageSpec spec) {
+        String text = layout.render(
                 layout.title("Slack Judge Batch - START"),
                 layout.section("실행정보", List.of(
-                        layout.kv("Job Name",spec.jobName()),
-                        layout.kv("Batch Time",FORMATTER.format(spec.batchTime())),
-                        layout.kv("Worker Node",spec.workerNode())
+                        layout.kv("Job Name", spec.jobName()),
+                        layout.kv("Batch Time", FORMATTER.format(spec.batchTime())),
+                        layout.kv("Worker Node", spec.workerNode())
                 )),
                 layout.footer("SlackJudge Batch System")
         );
+        return Attachment.builder()
+                .color(BLUE)
+                .text(text)
+                .mrkdwnIn(List.of("text"))
+                .build();
     }
 
-    public String batchEnd(BatchEndMessageSpec spec) {
-        return layout.render(
+    public Attachment batchEnd(BatchEndMessageSpec spec) {
+        String text = layout.render(
                 layout.title("SlackJudge Batch - " + spec.status()),
                 layout.section("실행 정보", List.of(
-                        layout.kv("발생 시간",FORMATTER.format(spec.time())),
+                        layout.kv("발생 시간", FORMATTER.format(spec.time())),
                         layout.kv("소요 시간", spec.duration() + "ms")
                 )),
                 layout.section("처리 결과", List.of(
@@ -45,21 +62,18 @@ public class SlackMessageFactory {
                 )),
                 layout.footer("SlackJudge Batch System")
         );
-    }
 
-    public String runtimeLog(LogEventMessageSpec spec) {
-        return layout.render(
-                layout.title("SlackJudge Batch - " + spec.level()),
-                layout.section("로그 정보", List.of(
-                        layout.kv("시각", FORMATTER.format(spec.occurredAt())),
-                        layout.kv("Logger", spec.logger())
-                )),
-                layout.section("메시지", List.of(layout.codeBlock(spec.message()))),
-                spec.stackTrace() == null || spec.stackTrace().isBlank()
-                        ? ""
-                        : layout.section("Exception", List.of(layout.codeBlock(spec.stackTrace()))),
-                layout.footer("SlackJudge Batch System")
-        );
+        String color = switch (spec.status()) {
+            case "FAILED" -> RED;
+            case "SUCCESS" -> spec.failedUsers() > 0 ? YELLOW : GREEN;
+            default -> BLUE;
+        };
+
+        return Attachment.builder()
+                .color(color)
+                .text(text)
+                .mrkdwnIn(List.of("text"))
+                .build();
     }
 
 }
