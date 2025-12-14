@@ -75,6 +75,6 @@ class TierChangeDetectorTest {
         detector.update(context);
 
         //then
-        verify(repository, times(1)).updateUsersTier("test",30);
+        verify(repository, times(1)).updateUsersTier("test",30,10);
     }
 }
