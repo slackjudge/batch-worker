@@ -1,24 +1,20 @@
-package store.slackjudge.batch.infra.mongo.service.detector;
+package store.slackjudge.batch.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import store.slackjudge.batch.infra.mongo.document.UserSolvedSnapShotDocument;
-import store.slackjudge.batch.infra.solvedac.dto.ProblemInfoResponse;
-import store.slackjudge.batch.infra.solvedac.dto.ProblemSearchResponse;
 import store.slackjudge.batch.repository.ProblemJdbcRepository;
 
-import java.util.Collection;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /* [ 사용자가 푼 문제 감지 전략 ]
  * 변경 감지 전략 구현체
  */
 @Component
 @RequiredArgsConstructor
-public class ProblemChangeDetector implements SnapshotDetectStrategy<ProblemSearchResponse> {
+public class ProblemChangeDetector implements SnapshotDetectStrategy<List<Integer>> {
     private final ProblemJdbcRepository repository;
 
     /*==========================
@@ -33,8 +29,8 @@ public class ProblemChangeDetector implements SnapshotDetectStrategy<ProblemSear
     *
     ==========================**/
     @Override
-    public boolean detect(DetectionContext<ProblemSearchResponse> context) {
-        return context.previous().getSolvedCount() != context.current().count();
+    public boolean detect(DetectionContext<List<Integer>> context) {
+        return context.previous().getSolvedCount() != context.current().size();
     }
 
     /*==========================
@@ -49,17 +45,13 @@ public class ProblemChangeDetector implements SnapshotDetectStrategy<ProblemSear
     *
     ==========================**/
     @Override
-    public void update(DetectionContext<ProblemSearchResponse> context) {
+    public void update(DetectionContext<List<Integer>> context) {
         //스냅샷에 존재하는 유저의 모든 문제 번호
         Set<Integer> previousProblemIds = context.previous().getSolvedProblemIds();
 
         //새로 조회한 유저의 모든 문제 번호
         Set<Integer> currentProblemIds =
-                context.current()
-                        .items()
-                        .stream()
-                        .map(ProblemInfoResponse::problemId)
-                        .collect(Collectors.toSet());
+                new HashSet<>(context.current());
 
         //새로 푼 문제 업데이트
         currentProblemIds.stream()
@@ -68,5 +60,22 @@ public class ProblemChangeDetector implements SnapshotDetectStrategy<ProblemSear
                 .forEach(pid -> {
                     repository.updateProblemSolved(context.snapshotAt(), context.userId(), pid);
                 });
+    }
+
+      /*==========================
+    *
+    *ProblemChangeDetector
+    * 신규 유저의 문제를 데이터베이스에 저장
+    * @param snapshotAt: 스냅샷 시각
+    * @param userId: 유저 ID
+    * @param problemId: 문제 번호
+    * @return void
+    * @author kimdoyeon
+    * @version 1.0.0
+    * @date 25. 12. 13.
+    *
+    ==========================**/
+    public void saveNewProblem(LocalDateTime snapshotAt, Long userId, List<Integer>problemIds) {
+        repository.batchInsertProblems(snapshotAt, userId, problemIds);
     }
 }

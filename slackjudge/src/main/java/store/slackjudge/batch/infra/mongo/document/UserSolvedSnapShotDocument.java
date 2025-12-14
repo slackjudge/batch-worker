@@ -9,6 +9,7 @@ import org.hibernate.annotations.Filter;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
@@ -17,7 +18,7 @@ import java.util.Set;
 @Getter
 @RequiredArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
-public class UserSolvedSnapShotDocument {
+public class UserSolvedSnapShotDocument implements Serializable {
     //(백준 아이디, 배치 동작 시간) 복합 키
     @Id
     private SnapShotId id;

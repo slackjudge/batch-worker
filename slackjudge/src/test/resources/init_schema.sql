@@ -1,6 +1,6 @@
 create table if not exists public.problem
 (
-    problem_id    bigint  not null
+    problem_id    integer  not null
         primary key,
     problem_title varchar(255),
     problem_level integer not null,
@@ -19,7 +19,7 @@ create table if not exists public.problem_problem_type
     problem_type_id bigint not null
         constraint fk_ptm_type
             references public.problem_type,
-    problem_id      bigint not null
+    problem_id      integer not null
         constraint fk_ptm_problem
             references public.problem
 );
@@ -48,7 +48,7 @@ create table public.users_problem
     user_id          bigint                not null
         constraint fk_up_user
             references public.users,
-    problem_id       bigint                not null
+    problem_id       integer                not null
         constraint fk_up_problem
             references public.problem,
     is_solved        boolean default false not null,

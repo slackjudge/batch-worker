@@ -39,8 +39,8 @@ public class CalculateSnapShotDate {
     * @date 25. 12. 10.
     *
     ==========================**/
-    public LocalDateTime currentHour(){
-        return now().truncatedTo(ChronoUnit.HOURS);
+    public LocalDateTime currentHour(LocalDateTime time){
+        return time.truncatedTo(ChronoUnit.HOURS);
     }
 
     /*==========================
@@ -52,8 +52,8 @@ public class CalculateSnapShotDate {
     * @date 25. 12. 10.
     *
     ==========================**/
-    public LocalDateTime snapshotDate(){
-        return currentHour().minusHours(1);
+    public LocalDateTime snapshotDate(LocalDateTime time){
+        return currentHour(time).minusHours(1);
     }
 
 }

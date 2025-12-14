@@ -3,6 +3,8 @@ package store.slackjudge.batch.infra.solvedac.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serializable;
+
 /**
  * solved.ac API 유저 정보 파싱용 dto
  */
@@ -12,5 +14,5 @@ public record UserInfoResponse(
         String handle,      //백준 아이디
         int tier,           //백준 티어
         int rating          //백준 기준 점수
-) {
+) implements Serializable {
 }
