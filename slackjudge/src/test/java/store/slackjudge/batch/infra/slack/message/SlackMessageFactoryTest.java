@@ -29,7 +29,7 @@ class SlackMessageFactoryTest {
         );
 
         //when
-        String message=factory.batchStart(spec);
+        String message= String.valueOf(factory.batchStart(spec));
 
         //then
         assertThat(message).contains("[ Slack Judge Batch - START ]");
