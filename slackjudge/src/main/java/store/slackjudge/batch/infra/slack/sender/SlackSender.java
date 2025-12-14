@@ -1,5 +1,8 @@
 package store.slackjudge.batch.infra.slack.sender;
 
+import com.slack.api.model.Attachment;
+
 public interface SlackSender {
-    void sendMessage(String text);
+    void sendMessage(Attachment attachment);
+    void sendLog(String text);
 }
