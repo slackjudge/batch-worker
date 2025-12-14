@@ -51,11 +51,6 @@ class AbstractSolvedAcApiClientTest {
             protected String parseResponse(String response) {
                 return response;
             }
-
-            @Override
-            protected void handleError(Exception e) {
-
-            }
         };
     }
 
@@ -194,11 +189,6 @@ class AbstractSolvedAcApiClientTest {
                 @Override
                 protected String parseResponse(String response) {
                     throw  new RuntimeException("json parsing error");
-                }
-
-                @Override
-                protected void handleError(Exception e) {
-                    handleErrorCount.incrementAndGet();
                 }
             };
 
