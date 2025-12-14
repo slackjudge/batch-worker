@@ -22,22 +22,18 @@ public class SlackJudgeBatchRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        LocalDateTime batchTime=parseBatchTime(args);
+        LocalDateTime batchTime = parseBatchTime(args);
         log.info("Slack Judge Batch Container Start  now time = {}", batchTime);
 
-        try {
-           JobParameters jobParameters = new JobParametersBuilder()
-                    .addLocalDateTime("batchTime", batchTime)
-                   .toJobParameters();
+        JobParameters jobParameters = new JobParametersBuilder()
+                .addLocalDateTime("batchTime", batchTime)
+                .toJobParameters();
 
-           jobLauncher.run(slackJudgeBatch,jobParameters);
+        jobLauncher.run(slackJudgeBatch, jobParameters);
 
-           log.info("Slack Judge Batch Complete");
-           System.exit(0);
-        }catch (Exception e){
-            //slack webhook 연동 -> 알림 설정
-            System.exit(1);
-        }
+        log.info("Slack Judge Batch Complete");
+        System.exit(0);
+
     }
 
     private LocalDateTime parseBatchTime(String[] args) {

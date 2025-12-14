@@ -202,7 +202,7 @@ public class DetectAndUpdateUserTierAndProblemTasklet implements Tasklet {
                             .bojId(bojId)
                             .build();
 
-                    if (!problemChangeDetector.detect(problemContext)) {
+                    if (problemChangeDetector.detect(problemContext)) {
                         hasChanges = true;
                         problemChangeDetector.update(problemContext);
                     }
