@@ -26,7 +26,7 @@ solved:
 
 slack:
   webhook:
-    url: ${SLACK_WEBHOOK_URL}
+    url: ${SLACK_WEBHOOK_URL:}
   enabled: true
   color:
     green: '#36a64f'
