@@ -1,0 +1,52 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  # PostgreSQL
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:postgresql:16:///testdb?TC_INITSCRIPT=init_schema.sql
+    username: test
+    password: pwd
+
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    defer-datasource-initialization: true
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  # Mongo
+  data:
+    mongodb:
+      database: snapshot
+      auto-index-creation: true
+
+  batch:
+    job:
+      enabled: false
+
+solved:
+  api:
+    user-info: https://solved.ac/api/v3/user/show
+    problem-info: https://solved.ac/api/v3/search/problem
+
+# Slack
+slack:
+  enabled: false
+  webhook:
+    url: http://localhost/dummy
+  color:
+    green: '#36a64f'
+    red: '#ff0000'
+    yellow: '#ffcc00'
+    blue: '#0070ce'
+
+logging:
+  level:
+    root: WARN
