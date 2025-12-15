@@ -1,10 +1,9 @@
+# application.yml
 project:
   name: Worker
   version: 1.0.0
+
 spring:
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration.class
   config:
     import:
       - postgres.yml
@@ -12,6 +11,19 @@ spring:
       - batch.yml
   application:
     name: worker
+
+solved:
+  api:
+    user-info: https://solved.ac/api/v3/user/show
+    problem-info: https://solved.ac/api/v3/search/problem
+
+slack:
+  enabled: true
+  color:
+    green: '#36a64f'
+    red: '#ff0000'
+    yellow: '#ffcc00'
+    blue: '#0070ce'
 
 logging:
   level:
@@ -34,11 +46,16 @@ slack:
     yellow: '#ffcc00'
     blue: '#0070ce'
 ---
-
 spring:
   config:
     activate:
       on-profile: local
+
+slack:
+  webhook:
+    url: http://localhost/dummy
+  enabled: false
+
 logging:
   level:
     root: DEBUG
@@ -48,11 +65,16 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
 
 ---
-
 spring:
   config:
     activate:
       on-profile: dev
+
+slack:
+  webhook:
+    url: ${SLACK_WEBHOOK_URL}
+  enabled: true
+
 logging:
   level:
     root: INFO
@@ -60,3 +82,20 @@ logging:
     com.midas.worker: INFO
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+slack:
+  webhook:
+    url: ${SLACK_WEBHOOK_URL}
+  enabled: true
+
+logging:
+  level:
+    root: WARN
+    org.springframework.batch: WARN
+    com.midas.worker: INFO

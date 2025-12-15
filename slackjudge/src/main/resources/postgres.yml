@@ -1,9 +1,7 @@
+# postgres.yml
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DATABASE:app}
-    username: ${POSTGRES_USER:kimdoyeon}
-    password: ${POSTGRES_PASSWORD:}
     hikari:
       max-lifetime: 300000
       validation-timeout: 5000
@@ -12,12 +10,28 @@ spring:
 ---
 spring.config.activate.on-profile: local
 
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/app
+    username: kimdoyeon
+    password: ""
+
 logging:
   level:
-    ROOT: INFO
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    org.hibernate.sql: debug
-    org.hibernate.type: trace
+    org.hibernate.sql: DEBUG
+    org.hibernate.type: TRACE
     com.zaxxer.hikari.HikariConfig: DEBUG
     org.postgresql: TRACE
+---
+spring.config.activate.on-profile: prod
 
+spring:
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DATABASE}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+
+logging:
+  level:
+    org.hibernate.sql: WARN
