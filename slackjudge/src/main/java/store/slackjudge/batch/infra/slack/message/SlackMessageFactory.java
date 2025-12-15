@@ -4,7 +4,6 @@ import com.slack.api.model.Attachment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import store.slackjudge.batch.infra.slack.logging.LogEventMessageSpec;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;

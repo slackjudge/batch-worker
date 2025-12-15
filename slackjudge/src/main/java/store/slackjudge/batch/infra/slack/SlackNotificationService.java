@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import store.slackjudge.batch.infra.slack.message.BatchEndMessageSpec;
 import store.slackjudge.batch.infra.slack.message.BatchStartMessageSpec;
-import store.slackjudge.batch.infra.slack.logging.LogEventMessageSpec;
 import store.slackjudge.batch.infra.slack.message.SlackMessageFactory;
 import store.slackjudge.batch.infra.slack.sender.SlackSender;
 

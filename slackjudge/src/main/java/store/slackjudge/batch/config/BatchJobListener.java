@@ -5,6 +5,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.annotation.BeforeJob;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import store.slackjudge.batch.common.CalculateSnapShotDate;
 import store.slackjudge.batch.infra.slack.SlackNotificationService;
@@ -16,6 +17,9 @@ import java.util.Objects;
 @Component
 @RequiredArgsConstructor
 public class BatchJobListener {
+    @Value("${spring.batch.name}")
+    private String jobName;
+
     private final BatchLogger logger;
     private final SlackNotificationService notificationService;
     private final CalculateSnapShotDate calculateSnapShotDate;
@@ -31,7 +35,7 @@ public class BatchJobListener {
         notificationService.notifyBatchStart(
                 jobExecution.getJobInstance().getJobName(),
                 batchTime,
-                "SlackJudge Batch Worker #1"
+                jobName
         );
     }
 

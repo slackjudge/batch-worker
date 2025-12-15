@@ -25,14 +25,4 @@ public class SlackWebhookSender implements SlackSender{
             log.error("[sending slack message] send message failed Error : {}",e.getMessage());
         }
     }
-
-    //로그만 전송
-    @Override
-    public void sendLog(String text) {
-        try {
-            slack.send(webhookUrl, Payload.builder().text(text).build());
-        }catch (Exception e){
-            log.error("[sending slack message] send logging message failed Error : {}",e.getMessage());
-        }
-    }
 }

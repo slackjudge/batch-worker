@@ -38,13 +38,7 @@ public class SlackLogAppender extends AppenderBase<ILoggingEvent> {
             }
 
             //로그 메세지 객체 생성
-            LogEventMessageSpec messageSpec = new LogEventMessageSpec(
-                    level,
-                    timestamp,
-                    event.getLoggerName(),
-                    event.getFormattedMessage(),
-                    stackTrace
-            );
+            LogEventMessageSpec messageSpec = LogEventMessageSpec.from(event);
 
             //slack 알림 전송
             slackSender.send(messageSpec);

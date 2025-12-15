@@ -8,15 +8,10 @@ import store.slackjudge.batch.infra.slack.sender.SlackSender;
 public class SlackLoggingWebhookSender implements SlackSender {
 
     private String webhookUrl;
-    private SlackLogFormatter formatter;
+    private final SlackLogFormatter formatter = new SlackLogFormatter();
 
     @Override
     public void sendMessage(Attachment attachment) {
-
-    }
-
-    @Override
-    public void sendLog(String text) {
 
     }
 
@@ -27,10 +22,6 @@ public class SlackLoggingWebhookSender implements SlackSender {
         }
 
         try {
-            if (formatter == null) {
-                formatter = new SlackLogFormatter();
-            }
-
             Attachment attachment = formatter.format(messageSpec);
 
             sendMessageInternal(messageSpec.isError() ? "🚨" : "⚠️", messageSpec.level(), attachment);
