@@ -4,6 +4,12 @@ spring:
     mongodb:
       auto-index-creation: true
 
+logging:
+  level:
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+    org.mongodb.driver.protocol.command: DEBUG
+    org.mongodb.driver.connection: DEBUG
+
 ---
 spring.config.activate.on-profile: local
 
@@ -27,10 +33,10 @@ spring:
       uri: ${MONGO_URL}
       username: ${MONGO_USER_NAME}
       password: ${MONGO_PASSWORD}
-      auto-index-creation: true
+      auto-index-creation: false
 
 logging:
   level:
-    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
-    org.mongodb.driver.protocol.command: DEBUG
-    org.mongodb.driver.connection: DEBUG
+    org.springframework.data.mongodb.core.MongoTemplate: WARN
+    org.mongodb.driver.protocol.command: WARN
+    org.mongodb.driver.connection: WARN

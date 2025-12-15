@@ -36,12 +36,12 @@ class ProblemChangeDetectorTest {
     )
     void detect_Return_TRUE() {
         //given
-        ProblemSearchResponse current = new ProblemSearchResponse(10, new ArrayList<>());
+        List<Integer> current = new ArrayList<>();
         UserSolvedSnapShotDocument previous = UserSolvedSnapShotDocument.builder()
                 .solvedCount(13)
                 .build();
 
-        DetectionContext<ProblemSearchResponse> context = new DetectionContext<>(current, previous, LocalDateTime.now(), 1L, "");
+        DetectionContext<List<Integer>> context = new DetectionContext<>(current, previous, LocalDateTime.now(), 1L, "");
 
         //when
         Boolean result = detector.detect(context);
@@ -56,12 +56,12 @@ class ProblemChangeDetectorTest {
     )
     void detect_Return_FALSE() {
         //given
-        ProblemSearchResponse current = new ProblemSearchResponse(10, new ArrayList<>());
+        List<Integer> current =  List.of(1,2,3,4,5,6,7,8,9,10);
         UserSolvedSnapShotDocument previous = UserSolvedSnapShotDocument.builder()
                 .solvedCount(10)
                 .build();
 
-        DetectionContext<ProblemSearchResponse> context = new DetectionContext<>(current, previous, LocalDateTime.now(), 1L, "");
+        DetectionContext<List<Integer>> context = new DetectionContext<>(current, previous, LocalDateTime.now(), 1L, "");
 
         //when
         Boolean result = detector.detect(context);
@@ -75,20 +75,20 @@ class ProblemChangeDetectorTest {
     void update_New_Solved() {
         //given
         Set<Integer> previousSolvedProblems = Set.of(12, 45, 37, 4); //이전에 푼 문제 번호
-        List<ProblemInfoResponse> currentSolvedProblem = List.of(
-                new ProblemInfoResponse(12),
-                new ProblemInfoResponse(45),
-                new ProblemInfoResponse(37),
-                new ProblemInfoResponse(4),
-                new ProblemInfoResponse(23),
-                new ProblemInfoResponse(11),
-                new ProblemInfoResponse(5)
+        List<Integer> currentSolvedProblem = List.of(
+                12,
+                45,
+                37,
+                4,
+                23,
+                11,
+                5
         ); //새로 푼 문제 번호 -> 23,11,5
 
         UserSolvedSnapShotDocument previous = UserSolvedSnapShotDocument.builder()
                 .solvedProblemIds(previousSolvedProblems).build();
-        ProblemSearchResponse current = new ProblemSearchResponse(7, currentSolvedProblem);
-        DetectionContext<ProblemSearchResponse> context = new DetectionContext<>(current, previous, LocalDateTime.now(), 1L, "test");
+        List<Integer> current = new ArrayList<>(currentSolvedProblem);
+        DetectionContext<List<Integer>> context = new DetectionContext<>(current, previous, LocalDateTime.now(), 1L, "test");
 
         //when
         detector.update(context);
@@ -105,17 +105,12 @@ class ProblemChangeDetectorTest {
     void update_Nothing() {
         //given
         Set<Integer> previousSolvedProblems = Set.of(12, 45, 37, 4); //이전에 푼 문제 번호
-        List<ProblemInfoResponse> currentSolvedProblem = List.of(
-                new ProblemInfoResponse(12),
-                new ProblemInfoResponse(45),
-                new ProblemInfoResponse(37),
-                new ProblemInfoResponse(4)
-        );
+        List<Integer> currentSolvedProblem = List.of(12, 45, 37, 4);
 
         UserSolvedSnapShotDocument previous = UserSolvedSnapShotDocument.builder()
                 .solvedProblemIds(previousSolvedProblems).build();
-        ProblemSearchResponse current = new ProblemSearchResponse(7, currentSolvedProblem);
-        DetectionContext<ProblemSearchResponse> context = new DetectionContext<>(current, previous, LocalDateTime.now(), 1L, "test");
+        List<Integer> current = new ArrayList<>(currentSolvedProblem);
+        DetectionContext<List<Integer>> context = new DetectionContext<>(current, previous, LocalDateTime.now(), 1L, "test");
 
         //when
         detector.update(context);

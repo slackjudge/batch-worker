@@ -31,6 +31,20 @@ logging:
     org.springframework.batch: INFO
     com.midas.worker: INFO
 
+solved:
+  api:
+    user-info: https://solved.ac/api/v3/user/show
+    problem-info: https://solved.ac/api/v3/search/problem
+
+slack:
+  webhook:
+    url: ${SLACK_WEBHOOK_URL:}
+  enabled: true
+  color:
+    green: '#36a64f'
+    red: '#ff0000'
+    yellow: '#ffcc00'
+    blue: '#0070ce'
 ---
 spring:
   config:

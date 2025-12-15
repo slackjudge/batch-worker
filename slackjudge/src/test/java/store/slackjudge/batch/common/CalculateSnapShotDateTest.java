@@ -36,7 +36,7 @@ class CalculateSnapShotDateTest {
         CalculateSnapShotDate calculator=new CalculateSnapShotDate(fixedClock);
 
         //when
-        LocalDateTime result=calculator.currentHour();
+        LocalDateTime result=calculator.currentHour(fixedTime);
 
         //then
         assertThat(result).isEqualTo(LocalDateTime.of(2025,12,12,12,0,0,0));
@@ -49,7 +49,7 @@ class CalculateSnapShotDateTest {
         CalculateSnapShotDate calculator=new CalculateSnapShotDate(fixedClock);
 
         //when
-        LocalDateTime result=calculator.snapshotDate();
+        LocalDateTime result=calculator.snapshotDate(fixedTime);
 
         //then
         assertThat(result).isEqualTo(LocalDateTime.of(2025,12,12,11,0,0,0));
