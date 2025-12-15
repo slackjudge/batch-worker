@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -23,11 +24,11 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-@TestPropertySource(locations = "/application.yml")
 @ContextConfiguration(classes = SlackjudgeApplication.class)
 @DataMongoTest
 @ExtendWith(SpringExtension.class)
 @DirtiesContext
+@ActiveProfiles("test")
 class UserSolvedSnapShotRepositoryTest {
     @Autowired
     private UserSolvedSnapShotRepository repository;
