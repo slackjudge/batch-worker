@@ -4,3 +4,4 @@ spring:
       initialize-schema: always
     job:
       enabled: false
+    name: 'SlackJudge Batch Worker #1'

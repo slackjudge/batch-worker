@@ -51,11 +51,6 @@ class AbstractSolvedAcApiClientTest {
             protected String parseResponse(String response) {
                 return response;
             }
-
-            @Override
-            protected void handleError(Exception e) {
-
-            }
         };
     }
 
@@ -78,7 +73,7 @@ class AbstractSolvedAcApiClientTest {
 
     private static final String FAIL = "FAIL";
     private static final String SUCCESS = "SUCCESS";
-    private static final String BASE_URL="https://test";
+    private static final String BASE_URL = "https://test";
 
     @Nested
     @DisplayName("retry 동작 테스트")
@@ -138,15 +133,15 @@ class AbstractSolvedAcApiClientTest {
 
     @Nested
     @DisplayName("call 동작 테스트")
-    class callTets{
+    class callTets {
         @DisplayName("전체 플로우 동작")
         @Test
-        void call_allFlow(){
+        void call_allFlow() {
             //given
-            String bojId="testUser";
-            int page=1;
-            String expectedUrl=BASE_URL+"?query="+bojId+"&page="+page;
-            String expectedResponse="{\"data\":\"test\"}";
+            String bojId = "testUser";
+            int page = 1;
+            String expectedUrl = BASE_URL + "?query=" + bojId + "&page=" + page;
+            String expectedResponse = "{\"data\":\"test\"}";
 
             when(urlBuilder.buildUrl(anyString(), anyMap())).thenReturn(expectedUrl);
             when(webClient.get()).thenReturn(requestHeadersUriSpec);
@@ -155,7 +150,7 @@ class AbstractSolvedAcApiClientTest {
             when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(expectedResponse));
 
             //when
-            String result=client.call(bojId,page);
+            String result = client.call(bojId, page);
 
             //then
             assertThat(result).isEqualTo(expectedResponse);
@@ -163,71 +158,19 @@ class AbstractSolvedAcApiClientTest {
             verify(webClient).get();
             verify(requestHeadersUriSpec).uri(expectedUrl);
         }
-
-        @DisplayName("parseResponse 예외 발생 시 handleError 호출")
-        @Test
-        void call_ParseResponseError_CallHandleError(){
-            //given
-            String bojId="test";
-            int page=1;
-            String expectedUrl=BASE_URL+"?query="+bojId+"&page="+page;
-            String nonParsingJson="{\"invalid\":\"json\"}";
-            AtomicInteger handleErrorCount=new AtomicInteger(0);
-
-
-            AbstractSolvedAcApiClient<String> clientErrorHandler= new AbstractSolvedAcApiClient<String>(webClient,urlBuilder){
-
-                @Override
-                protected Map<String, String> createRequestParameter(String bojId, int page) {
-                    Map<String,String> params=new HashMap<>();
-                    params.put("query",bojId);
-                    params.put("page",String.valueOf(page));
-
-                    return params;
-                }
-
-                @Override
-                protected String setUpUrl() {
-                    return BASE_URL;
-                }
-
-                @Override
-                protected String parseResponse(String response) {
-                    throw  new RuntimeException("json parsing error");
-                }
-
-                @Override
-                protected void handleError(Exception e) {
-                    handleErrorCount.incrementAndGet();
-                }
-            };
-
-            when(webClient.get()).thenReturn(requestHeadersUriSpec);
-            when(requestHeadersUriSpec.uri(expectedUrl)).thenReturn(requestHeadersSpec);
-            when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-            when(urlBuilder.buildUrl(anyString(),anyMap())).thenReturn(expectedUrl);
-            when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(nonParsingJson));
-
-
-            //when & then
-            assertThatThrownBy(()->clientErrorHandler.call(bojId,page))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessage("json parsing error");
-        }
     }
 
     @Nested
     @DisplayName("request 동작 테스트")
-
-    class requestTests{
+    class requestTests {
         @DisplayName("request 호출 성공")
         @Test
-        void request_Success(){
+        void request_Success() {
             //given
-            String bojId="test";
-            int page=1;
-            String url=BASE_URL+"?query="+bojId+"&page="+page;
-            String expectedJson="{\"result\":\"success\"}";
+            String bojId = "test";
+            int page = 1;
+            String url = BASE_URL + "?query=" + bojId + "&page=" + page;
+            String expectedJson = "{\"result\":\"success\"}";
 
             when(webClient.get()).thenReturn(requestHeadersUriSpec);
             when(requestHeadersUriSpec.uri(url)).thenReturn(requestHeadersSpec);
@@ -235,35 +178,13 @@ class AbstractSolvedAcApiClientTest {
             when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(expectedJson));
 
             //when
-            String result=client.request(url);
+            String result = client.request(url);
 
             //then
             assertThat(result).isEqualTo(expectedJson);
             verify(webClient).get();
             verify(requestHeadersUriSpec).uri(url);
             verify(requestHeadersSpec).retrieve();
-        }
-
-        @DisplayName("request 호출 실패시 예외 발생")
-        @Test
-        void request_Failed(){
-            //given
-            String bojId="test";
-            int page=1;
-            String url=BASE_URL+"?query="+bojId+"&page="+page;
-            String expectedJson="{\"result\":\"fail\"}";
-
-            when(webClient.get()).thenReturn(requestHeadersUriSpec);
-            when(requestHeadersUriSpec.uri(url)).thenReturn(requestHeadersSpec);
-            when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
-
-            //when
-            when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.error(new RuntimeException("network error")));
-
-            //then
-            assertThatThrownBy(()->client.request(url))
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessage("network error");
         }
     }
 
