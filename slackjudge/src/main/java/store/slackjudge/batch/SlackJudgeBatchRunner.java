@@ -8,6 +8,7 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import store.slackjudge.batch.common.CalculateSnapShotDate;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -18,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 public class SlackJudgeBatchRunner implements CommandLineRunner {
     private final JobLauncher jobLauncher;
     private final Job slackJudgeBatch;
+    private final CalculateSnapShotDate calculateSnapShotDate;
 
     @Override
     public void run(String... args) throws Exception {
@@ -39,11 +41,11 @@ public class SlackJudgeBatchRunner implements CommandLineRunner {
     private LocalDateTime parseBatchTime(String[] args) {
         if (args.length > 0) {
             try {
-                return LocalDateTime.parse(args[0], DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                return calculateSnapShotDate.returnKst(LocalDateTime.parse(args[0], DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             } catch (Exception e) {
                 log.warn("Invalid batchTime format: {}, using current time", args[0]);
             }
         }
-        return LocalDateTime.now();
+        return calculateSnapShotDate.returnKst(LocalDateTime.now());
     }
 }
