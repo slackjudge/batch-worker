@@ -1,9 +1,26 @@
-# Java 17
+# Build stage
+FROM eclipse-temurin:17-jdk AS builder
+
+WORKDIR /app
+
+# Gradle wrapper 복사
+COPY gradlew .
+COPY gradle gradle
+RUN chmod +x gradlew
+
+# 의존성 캐싱을 위해 build 파일 먼저 복사
+COPY build.gradle settings.gradle ./
+RUN ./gradlew dependencies --no-daemon
+
+# 소스 복사 및 빌드
+COPY src src
+RUN ./gradlew bootJar --no-daemon
+
+# Run stage
 FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 
+COPY --from=builder /app/build/libs/*.jar app.jar
 
-COPY build/libs/batch-0.0.1-SNAPSHOT.jar app.jar
-
-ENTRYPOINT ["java","-jar","app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
