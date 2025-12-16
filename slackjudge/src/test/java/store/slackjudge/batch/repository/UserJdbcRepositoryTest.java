@@ -18,6 +18,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
+
 @ActiveProfiles("test")
 @EnablePostgresTest
 @DataJpaTest
@@ -42,10 +43,10 @@ class UserJdbcRepositoryTest {
                 """;
 
         Object[][] dummyUsers = {
-                {"slack1", "test1", "user1", 10, "teamA",100},
-                {"slack2", "test2", "user2", 20, "teamA",200},
-                {"slack3", "test3", "user3", 30, "teamB",300},
-                {"slack4", "test4", "user4", 40, "teamB",400}
+                {"slack1", "test1", "user1", 10, "teamA", 100},
+                {"slack2", "test2", "user2", 20, "teamA", 200},
+                {"slack3", "test3", "user3", 30, "teamB", 300},
+                {"slack4", "test4", "user4", 40, "teamB", 400}
         };
 
         for (Object[] user : dummyUsers) {
@@ -58,38 +59,67 @@ class UserJdbcRepositoryTest {
     @DisplayName("모든 유저를 조회하고 UserInfo 형식의 리스트 반환")
     void findAllUserInfo() {
         //given & when
-        List<UserInfo> results=repository.findAllUserInfo();
+        List<UserInfo> results = repository.findAllUserInfo();
 
         //then
         assertThat(results).isNotEmpty();
         assertThat(results.size()).isEqualTo(4);
 
-        List<String> bojIds=new ArrayList<>();
-        for (UserInfo info:results){
+        List<String> bojIds = new ArrayList<>();
+        for (UserInfo info : results) {
             bojIds.add(info.baekJoonId());
         }
-        assertThat(bojIds).containsExactlyInAnyOrder("test1","test2","test3","test4");
+        assertThat(bojIds).containsExactlyInAnyOrder("test1", "test2", "test3", "test4");
     }
 
     @Test
     @DisplayName("유저의 새로운 티어를 업데이트")
     void updateUsersTier() {
         //given
-        String bojId="test3"; //test3 유저 업데이트
-        int newTier=42;
-        int newSolvedCount=3333;
+        String bojId = "test3"; //test3 유저 업데이트
+        int newTier = 42;
+        int newSolvedCount = 3333;
 
         //when
-        repository.updateUsersTier(bojId,newTier,newSolvedCount);
+        repository.updateUsersTier(bojId, newTier, newSolvedCount);
 
         //then
-        String tierSql="SELECT boj_tier FROM users WHERE baekjoon_id = ?";
-        String countSql="SELECT total_solved_count FROM users WHERE baekjoon_id = ?";
+        String tierSql = "SELECT boj_tier FROM users WHERE baekjoon_id = ?";
+        String countSql = "SELECT total_solved_count FROM users WHERE baekjoon_id = ?";
 
-        String fetchUsersTier=jdbcTemplate.queryForObject(tierSql,String.class,bojId);
-        Integer solvedCount=jdbcTemplate.queryForObject(countSql,Integer.class,bojId);
+        String fetchUsersTier = jdbcTemplate.queryForObject(tierSql, String.class, bojId);
+        Integer solvedCount = jdbcTemplate.queryForObject(countSql, Integer.class, bojId);
 
         assertThat(fetchUsersTier).isEqualTo(String.valueOf(newTier));
         assertThat(solvedCount).isEqualTo(newSolvedCount);
+    }
+
+    @Test
+    @DisplayName("백준 아이디가 initial이면 조회하지 않습니다.")
+    void notSearchEmptyUser() {
+        //given
+        Object[][] dummyUsers = {
+                {"slack5", "initial", "user5", 40, "teamB", 400} //<-조회되면 안됨
+        };
+
+        String insert = """
+                INSERT INTO users (slack_id, baekjoon_id, user_name, boj_tier, team_name,total_solved_count)
+                VALUES (?, ?, ?, ?, ?,?)
+                """;
+
+        for (Object[] user : dummyUsers) {
+            jdbcTemplate.update(insert, user);
+        }
+
+        //when
+        List<UserInfo> userInfos=repository.findAllUserInfo();
+
+        //then
+        assertThat(userInfos).isNotEmpty();
+        List<String> findUsersBaekjoonIds=new ArrayList<>();
+        userInfos.forEach(u->findUsersBaekjoonIds.add(u.baekJoonId()));
+
+        assertThat(userInfos.size()).isEqualTo(4);
+        assertThat(findUsersBaekjoonIds).containsExactlyInAnyOrder("test1","test2","test3","test4");
     }
 }
