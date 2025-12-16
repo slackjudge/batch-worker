@@ -31,6 +31,8 @@ public class UserJdbcRepository {
                     boj_tier
                 FROM
                     users
+                WHERE
+                    baekjoon_id != 'initial'
                 """;
 
         return jdbcTemplate.query(sql, ((rs, rowNum) ->
