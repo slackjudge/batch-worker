@@ -26,7 +26,8 @@ public class TierChangeDetector implements SnapshotDetectStrategy<UserInfoRespon
     ==========================**/
     @Override
     public boolean detect(DetectionContext<UserInfoResponse> context) {
-        return context.current().tier()!=context.previous().getTier();
+        return context.current().tier()!=context.previous().getTier() ||
+               context.current().solvedCount()!=context.previous().getSolvedCount();
     }
 
     /*==========================
