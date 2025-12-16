@@ -16,7 +16,8 @@ spring.config.activate.on-profile: local
 spring:
   data:
     mongodb:
-      uri: mongodb://localhost:27017/app
+      uri: mongodb://localhost:27017
+      database: app
 
 logging:
   level:
@@ -31,6 +32,7 @@ spring:
   data:
     mongodb:
       uri: ${MONGO_URI}
+      database: ${MONGO_DATABASE}
       username: ${MONGO_USER_NAME}
       password: ${MONGO_PASSWORD}
       auto-index-creation: false

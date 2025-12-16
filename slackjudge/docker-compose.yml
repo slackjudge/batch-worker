@@ -1,0 +1,58 @@
+services:
+  batch:
+    build: .
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-local}
+      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      POSTGRES_DATABASE: ${POSTGRES_DATABASE:-app}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      MONGO_URI: ${MONGO_URI:-mongodb://mongo:mongo@mongodb:27017}
+      MONGO_DATABASE: ${MONGO_DATABASE:-app}
+      MONGO_USER_NAME: ${MONGO_USER_NAME:-mongo}
+      MONGO_PASSWORD: ${MONGO_PASSWORD:-mongo}
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL:-}
+    entrypoint: ["/bin/sh", "-c", "java -jar app.jar $(date -u +'%Y-%m-%dT%H:%M:%SZ')"]
+
+  # 로컬 DB 컨테이너 (--profile local 옵션 사용 시에만 실행)
+  postgres:
+    profiles: [local]
+    image: postgres:17
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongodb:
+    profiles: [local]
+    image: mongo:8.0
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: mongo
+      MONGO_INITDB_DATABASE: app
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  mongodb_data:
