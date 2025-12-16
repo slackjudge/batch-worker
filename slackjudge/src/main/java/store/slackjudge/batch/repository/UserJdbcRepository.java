@@ -11,6 +11,7 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 public class UserJdbcRepository {
+    private static final String INITIAL_BAEKJOON_ID="initial";
     private final JdbcTemplate jdbcTemplate;
 
     /*==========================
@@ -32,7 +33,7 @@ public class UserJdbcRepository {
                 FROM
                     users
                 WHERE
-                    baekjoon_id != 'initial'
+                     baekjoon_id <> ?
                 """;
 
         return jdbcTemplate.query(sql, ((rs, rowNum) ->
@@ -40,7 +41,9 @@ public class UserJdbcRepository {
                         rs.getString("baekjoon_id"),
                         rs.getLong("user_id"),
                         rs.getInt("boj_tier")
-                )));
+                )),
+                INITIAL_BAEKJOON_ID
+        );
     }
 
 
