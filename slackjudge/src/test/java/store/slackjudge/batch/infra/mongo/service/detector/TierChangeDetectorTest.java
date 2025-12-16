@@ -49,6 +49,7 @@ class TierChangeDetectorTest {
         //given
         UserSolvedSnapShotDocument previous = UserSolvedSnapShotDocument.builder()
                 .tier(10)
+                .solvedCount(10)
                 .build();
         UserInfoResponse current = new UserInfoResponse(10, "test", 10, 10);
 
