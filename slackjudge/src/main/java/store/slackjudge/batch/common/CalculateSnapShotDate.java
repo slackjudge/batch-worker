@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 
 /**
@@ -14,6 +16,8 @@ import java.time.temporal.ChronoUnit;
 @RequiredArgsConstructor
 public class CalculateSnapShotDate {
     private final Clock clock;
+    private final ZoneId KST=ZoneId.of("Asia/Seoul");
+    private final ZoneId UTC=ZoneId.of("UTC");
 
     /*==========================
     *
@@ -56,4 +60,21 @@ public class CalculateSnapShotDate {
         return currentHour(time).minusHours(1);
     }
 
+
+    /*==========================
+    *
+    *CalculateSnapShotDate
+    * UTC->KST
+    * @parm
+    * @return
+    * @author kimdoyeon
+    * @version 1.0.0
+    * @date 25. 12. 16.
+    *
+    ==========================**/
+    public LocalDateTime returnKst(LocalDateTime utcTime){
+        return utcTime.atZone(UTC)
+                .withZoneSameInstant(KST)
+                .toLocalDateTime();
+    }
 }
