@@ -26,7 +26,7 @@ public class ProblemJdbcRepository {
     * @date 25. 12. 8.
     *
     ==========================**/
-    public void updateProblemSolved(LocalDateTime batchTime, Long userId, Integer problemNumber){
+    public void updateProblemSolved(LocalDateTime batchTime, Long userId, Integer problemNumber) {
         String sql = """
                 INSERT INTO users_problem (user_id, problem_id, is_solved, solved_time)
                 VALUES (?, ?, true, ?)
@@ -41,16 +41,16 @@ public class ProblemJdbcRepository {
 
     public void batchInsertProblems(LocalDateTime snapshotAt, Long userId, List<Integer> problemIds) {
         String sql = """
-            INSERT INTO users_problem (user_id, problem_id, is_solved, solved_time)
-            VALUES (?, ?, true, ?)
-            ON CONFLICT (user_id, problem_id) DO NOTHING
-            """;
+                INSERT INTO users_problem (user_id, problem_id, is_solved, solved_time)
+                VALUES (?, ?, true, ?)
+                ON CONFLICT (user_id, problem_id) DO NOTHING
+                """;
 
-    jdbcTemplate.batchUpdate(sql, problemIds, problemIds.size(),
-        (ps, problemId) -> {
-            ps.setLong(1, userId);
-            ps.setInt(2, problemId);
-            ps.setTimestamp(3, java.sql.Timestamp.valueOf(snapshotAt));
-        });
+        jdbcTemplate.batchUpdate(sql, problemIds, problemIds.size(),
+                (ps, problemId) -> {
+                    ps.setLong(1, userId);
+                    ps.setInt(2, problemId);
+                    ps.setTimestamp(3, java.sql.Timestamp.valueOf(snapshotAt));
+                });
     }
 }

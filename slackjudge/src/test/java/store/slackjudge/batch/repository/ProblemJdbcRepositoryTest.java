@@ -15,9 +15,11 @@ import store.slackjudge.batch.EnablePostgresTest;
 import store.slackjudge.batch.PostgresTestContainer;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
+
 @ActiveProfiles("test")
 @EnablePostgresTest
 @DataJpaTest
@@ -153,6 +155,58 @@ class ProblemJdbcRepositoryTest {
         assertThat(usersProblem.problemId).isEqualTo(problemId);
         assertThat(usersProblem.solvedTime).isEqualTo(batchTime);
         assertThat(usersProblem.userId).isEqualTo(userId);
+    }
+
+    @DisplayName("여러 문제를 batch로 INSERT(중복은 무시)")
+    @Test
+    void batchInsertProblems() {
+        // given
+        Long userId = 12L;
+        LocalDateTime snapshotAt = LocalDateTime.of(2025, 1, 1, 10, 0);
+        List<Integer> problemIds = List.of(1000, 1001);
+
+        // 기존 데이터 하나 삽입(중복 검증용)
+        jdbcTemplate.update("""
+                INSERT INTO users_problem (user_id, problem_id, is_solved, solved_time)
+                VALUES (?, ?, true, ?)
+                """, userId, 1000, LocalDateTime.of(2000, 1, 1, 0, 0));
+
+        // when
+        repository.batchInsertProblems(snapshotAt, userId, problemIds);
+
+        // then
+        String sql = """
+                SELECT user_id, problem_id, is_solved, solved_time
+                FROM users_problem
+                WHERE user_id = ?
+                ORDER BY problem_id
+                """;
+
+        List<UsersProblem> results = jdbcTemplate.query(
+                sql,
+                (rs, rowNum) -> new UsersProblem(
+                        rs.getLong("user_id"),
+                        rs.getInt("problem_id"),
+                        rs.getBoolean("is_solved"),
+                        rs.getTimestamp("solved_time").toLocalDateTime()
+                ),
+                userId
+        );
+
+        // problem_id = 1000,1001 총 2개
+        assertThat(results).hasSize(2);
+
+        // 1000번 문제는 기존 데이터 유지 (ON CONFLICT DO NOTHING)
+        UsersProblem first = results.get(0);
+        assertThat(first.problemId()).isEqualTo(1000);
+        assertThat(first.solvedTime())
+                .isEqualTo(LocalDateTime.of(2000, 1, 1, 0, 0));
+
+        // 1001번 문제는 새로 INSERT
+        UsersProblem second = results.get(1);
+        assertThat(second.problemId()).isEqualTo(1001);
+        assertThat(second.solvedTime()).isEqualTo(snapshotAt);
+        assertThat(second.isSolved()).isTrue();
     }
 
 }
