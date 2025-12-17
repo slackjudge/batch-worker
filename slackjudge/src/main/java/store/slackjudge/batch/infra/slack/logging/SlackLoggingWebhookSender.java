@@ -9,13 +9,33 @@ public class SlackLoggingWebhookSender implements SlackSender {
 
     private String webhookUrl;
     private final SlackLogFormatter formatter = new SlackLogFormatter();
-
+    /*==========================
+     *
+     * sendMessage
+     *
+     * @parm attachment Slack으로 전송할 Attachment 객체
+     * @return void
+     *
+     * @author kimdoyeon
+     * @version 1.0.0
+     * @date 25. 12. 17.
+     *
+     ==========================**/
     @Override
     public void sendMessage(Attachment attachment) {
 
     }
-
-    // LogAppender에서 직접 호출할 메서드
+    /*==========================
+     *
+     * send
+     *
+     * @parm messageSpec Slack 전송용 로그 이벤트 정보
+     * @return void
+     *
+     * @author kimdoyeon
+     * @version 1.0.0
+     * @date 25. 12. 17.
+     ==========================**/
     public void send(LogEventMessageSpec messageSpec) {
         if (webhookUrl == null || webhookUrl.isEmpty()) {
             return;
@@ -31,6 +51,20 @@ public class SlackLoggingWebhookSender implements SlackSender {
         }
     }
 
+    /*==========================
+     *
+     * sendMessageInternal
+     *
+     * @parm emoji 로그 심각도 표시용 이모지
+     * @parm level 로그 레벨
+     * @parm attachment Slack으로 전송할 Attachment
+     * @return void
+     *
+     * @author kimdoyeon
+     * @version 1.0.0
+     * @date 25. 12. 17.
+     *
+     ==========================**/
     private void sendMessageInternal(String emoji, String level, Attachment attachment) {
         try {
             com.slack.api.Slack slack = com.slack.api.Slack.getInstance();
@@ -45,6 +79,19 @@ public class SlackLoggingWebhookSender implements SlackSender {
         }
     }
 
+    /*==========================
+     *
+     * setWebhookUrl
+     *
+     * @parm webhookUrl Slack Incoming Webhook URL
+     * @return void
+     * logback 설정 파일에서 주입되며 슬랙 전송 대상 Webhook을 설정
+     *
+     * @author kimdoyeon
+     * @version 1.0.0
+     * @date 25. 12. 17.
+     *
+     ==========================**/
     public void setWebhookUrl(String webhookUrl) {
         this.webhookUrl = webhookUrl;
     }

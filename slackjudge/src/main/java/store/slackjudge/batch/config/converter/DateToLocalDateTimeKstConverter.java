@@ -11,6 +11,17 @@ import java.util.Date;
 @Component
 @ReadingConverter
 public class DateToLocalDateTimeKstConverter implements Converter<Date, LocalDateTime> {
+    /*==========================
+    *
+    *DateToLocalDateTimeKstConverter
+    * UTC->KST로 변환합니다.
+    * @parm source : 입력 날짜
+    * @return UTC로 변환된 LocalDateTime
+    * @author kimdoyeon
+    * @version 1.0.0
+    * @date 25. 12. 17.
+    *
+    ==========================**/
     @Override
     public LocalDateTime convert(Date source) {
         //UTC->KST

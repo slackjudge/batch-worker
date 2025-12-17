@@ -28,7 +28,24 @@ import java.util.Map;
 public class SaveSnapshotTasklet implements Tasklet {
     private final UserSnapShotService service;
     private final BatchLogger logger;
-
+    /*==========================
+     *
+     * execute
+     *
+     * @parm contribution Step 실행 기여도 정보
+     * @parm chunkContext Step/Job 실행 컨텍스트
+     * @return RepeatStatus Tasklet 실행 완료 여부
+     *
+     * JobExecutionContext에서 최신 스냅샷 데이터를 조회한 후
+     * MongoDB에 사용자별 스냅샷을 저장
+     *
+     * 저장할 데이터가 없는 경우 별도 처리 없이 Step을 종료
+     *
+     * @author kimdoyeon
+     * @version 1.0.0
+     * @date 25. 12. 17.
+     *
+     ==========================**/
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
         logger.stepStart("SaveSnapshotTasklet");

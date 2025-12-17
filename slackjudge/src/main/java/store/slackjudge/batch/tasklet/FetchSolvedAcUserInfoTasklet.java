@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
@@ -20,7 +19,6 @@ import store.slackjudge.batch.infra.solvedac.dto.UserInfoResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * [ step 03 ]
@@ -39,6 +37,23 @@ public class FetchSolvedAcUserInfoTasklet implements Tasklet {
     private final RetryTemplate retryTemplate;
 
 
+    /*==========================
+     *
+     * execute
+     *
+     * @parm contribution Step 실행 기여도 정보
+     * @parm chunkContext Step/Job 실행 컨텍스트
+     * @return RepeatStatus Tasklet 실행 완료 여부
+     *
+     * JobExecutionContext에서 사용자 목록을 조회한 후
+     * solved.ac API를 호출하여 사용자 정보를 수집하고
+     * 조회 결과를 다음 Step에서 사용할 수 있도록 ExecutionContext에 저장
+     *
+     * @author kimdoyeon
+     * @version 1.0.0
+     * @date 25. 12. 17.
+     *
+     ==========================**/
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         logger.stepStart("FetchSolvedAcUserInfoTasklet");

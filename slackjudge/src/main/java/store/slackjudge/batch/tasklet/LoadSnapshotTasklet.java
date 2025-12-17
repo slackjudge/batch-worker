@@ -57,7 +57,23 @@ public class LoadSnapshotTasklet implements Tasklet {
         this.batchTime = batchTime;
     }
 
-
+    /*==========================
+     *
+     * execute
+     *
+     * @parm contribution Step 실행 기여도 정보
+     * @parm chunkContext Step/Job 실행 컨텍스트
+     * @return RepeatStatus Tasklet 실행 완료 여부
+     *
+     * JobExecutionContext로부터 사용자 목록을 조회한 뒤
+     * 기준 시각의 스냅샷을 MongoDB에서 조회
+     * 사용자별 스냅샷 맵 형태로 ExecutionContext에 저장
+     *
+     * @author kimdoyeon
+     * @version 1.0.0
+     * @date 25. 12. 17.
+     *
+     ==========================**/
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         logger.stepStart("LoadSnapshotTasklet");

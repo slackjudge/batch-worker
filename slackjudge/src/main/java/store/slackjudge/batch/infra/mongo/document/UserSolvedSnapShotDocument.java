@@ -18,6 +18,9 @@ import java.util.Set;
 @Getter
 @RequiredArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
+/**
+ * 유저가 푼 문제 스냅샷 document
+ */
 public class UserSolvedSnapShotDocument implements Serializable {
     //(백준 아이디, 배치 동작 시간) 복합 키
     @Id

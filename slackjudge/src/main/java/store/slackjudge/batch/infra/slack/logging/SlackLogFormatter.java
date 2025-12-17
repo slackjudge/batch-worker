@@ -7,7 +7,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SlackLogFormatter {
-
+    /*==========================
+     *
+     * format
+     *
+     * @parm messageSpec Slack 전송용 가공된 로그 이벤트 정보
+     * @return Attachment Slack Webhook 전송에 사용되는 Attachment 객체
+     * 로그 레벨에 따라 색상을 구분, 메시지 및 StackTrace를 필드로 구성
+     *
+     * @author kimdoyeon
+     * @version 1.0.0
+     * @date 25. 12. 17.
+     *
+     ==========================**/
     //로그 포맷팅 메서드
     public Attachment format(LogEventMessageSpec messageSpec) {
         List<Field> fields = new ArrayList<>();
@@ -29,6 +41,21 @@ public class SlackLogFormatter {
                 .build();
     }
 
+    /*==========================
+     *
+     * createField
+     *
+     * @parm title 슬랙 필드 제목
+     * @parm value 슬랙 필드 값
+     * @parm shortField 한 줄 표시 여부
+     * @return Field Slack Attachment에 포함될 Field 객체
+     * Slack 메시지의 각 항목을 표준화된 필드 형태로 생성
+     *
+     * @author kimdoyeon
+     * @version 1.0.0
+     * @date 25. 12. 17.
+     *
+     ==========================**/
     private Field createField(String title, String value, boolean shortField) {
         return Field.builder()
                 .title(title)
@@ -37,6 +64,19 @@ public class SlackLogFormatter {
                 .build();
     }
 
+    /*==========================
+     *
+     * truncate
+     *
+     * @parm text 원본 문자열
+     * @parm maxLength 최대 허용 길이
+     * @return String 최대 길이를 초과할 경우 잘린 문자열
+     *
+     * @author kimdoyeon
+     * @version 1.0.0
+     * @date 25. 12. 17.
+     *
+     ==========================**/
     private String truncate(String text, int maxLength) {
         if (text == null) return "";
         if (text.length() <= maxLength) return text;

@@ -6,7 +6,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 
 /**
- * solved.ac API 유저 정보 파싱용 dto
+ * solved.ac API 유저 정보 파싱용 DTO
+ * @param solvedCount 푼 문제 수
+ * @param handle 백준 아이디
+ * @param tier 백준 티어
+ * @param rating 백준 점수
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record UserInfoResponse(

@@ -11,10 +11,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 import store.slackjudge.batch.tasklet.*;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-
 @Configuration
 @RequiredArgsConstructor
 public class BatchConfig {
@@ -26,12 +22,17 @@ public class BatchConfig {
     private final SaveSnapshotTasklet saveSnapshotTasklet;
     private final BatchJobListener jobListener;
 
-    private final BatchLogger logger;
-
-
-    /* ===========================================
-     *  Job 정의
-     * =========================================== */
+    /*==========================
+    *
+    *BatchConfig
+    * Job 정의
+    * @parm
+    * @return
+    * @author kimdoyeon
+    * @version 1.0.0
+    * @date 25. 12. 17.
+    *
+    ==========================**/
     @Bean
     public Job slackJudgeBatch(
             JobRepository jobRepository,
@@ -52,9 +53,18 @@ public class BatchConfig {
     }
 
 
-    /* ===========================================
-     *  Step01: RDB에서 유저 조회
-     * =========================================== */
+    /*==========================
+    *
+    *BatchConfig
+    * Step01: RDB에서 유저 조회
+    * @parm  jobRepository     : Batch job repository
+    *        transactionManager: 트랜잭션 엔진 공통 인터페이스
+    * @return
+    * @author kimdoyeon
+    * @version 1.0.0
+    * @date 25. 12. 17.
+    *
+    ==========================**/
     @Bean
     public Step loadAllUsersStep(
             JobRepository jobRepository,
@@ -74,9 +84,18 @@ public class BatchConfig {
     }
 
 
-    /* ===========================================
-     *  Step02: Mongo Snapshot 조회
-     * =========================================== */
+    /*==========================
+    *
+    *BatchConfig
+    * Step02: Mongo Snapshot 조회
+    * @parm jobRepository     : Batch job repository
+    *       transactionManager: 트랜잭션 엔진 공통 인터페이스
+    * @return
+    * @author kimdoyeon
+    * @version 1.0.0
+    * @date 25. 12. 17.
+    *
+    ==========================**/
     @Bean
     public Step loadSnapshotStep(
             JobRepository jobRepository,
@@ -96,9 +115,18 @@ public class BatchConfig {
     }
 
 
-    /* ===========================================
-     *  Step03: solved.ac 유저 정보 조회
-     * =========================================== */
+    /*==========================
+    *
+    *BatchConfig
+    * Step03: solved.ac 유저 정보 조회
+    * @parm jobRepository     : Batch job repository
+    *       transactionManager: 트랜잭션 엔진 공통 인터페이스
+    * @return
+    * @author kimdoyeon
+    * @version 1.0.0
+    * @date 25. 12. 17.
+    *
+    ==========================**/
     @Bean
     public Step fetchSolvedAcUserInfoStep(
             JobRepository jobRepository,
@@ -118,9 +146,18 @@ public class BatchConfig {
     }
 
 
-    /* ===========================================
-     *  Step04: 변경 감지
-     * =========================================== */
+    /*==========================
+    *
+    *BatchConfig
+    * Step04: 변경 감지
+    * @parm jobRepository     : Batch job repository
+    *       transactionManager: 트랜잭션 엔진 공통 인터페이스
+    * @return
+    * @author kimdoyeon
+    * @version 1.0.0
+    * @date 25. 12. 17.
+    *
+    ==========================**/
     @Bean
     public Step detectAndUpdateUserTierAndProblemStep(
             JobRepository jobRepository,
@@ -140,9 +177,18 @@ public class BatchConfig {
     }
 
 
-    /* ===========================================
-     *  Step05: Snapshot 저장
-     * =========================================== */
+    /*==========================
+    *
+    *BatchConfig
+    * Step05: Snapshot 저장
+    * @parm jobRepository     : Batch job repository
+    *       transactionManager: 트랜잭션 엔진 공통 인터페이스
+    * @return
+    * @author kimdoyeon
+    * @version 1.0.0
+    * @date 25. 12. 17.
+    *
+    ==========================**/
     @Bean
     public Step saveSnapshotStep(
             JobRepository jobRepository,
