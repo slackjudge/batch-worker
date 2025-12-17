@@ -10,6 +10,9 @@ import java.util.Objects;
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @RequiredArgsConstructor
 @Getter
+/**
+ * Snapshot document 복합키
+ */
 public class SnapShotId implements Serializable {
     private String bojId;
     private LocalDateTime snapShotAt;

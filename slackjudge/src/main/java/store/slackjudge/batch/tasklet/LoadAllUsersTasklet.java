@@ -32,6 +32,22 @@ public class LoadAllUsersTasklet implements Tasklet {
      * next step : LoadSnapshotTasklet
      */
 
+    /*==========================
+     *
+     * execute
+     *
+     * @parm contribution Step 실행 기여도 정보
+     * @parm chunkContext Step/Job 실행 컨텍스트
+     * @return RepeatStatus Tasklet 실행 완료 여부
+     *
+     * RDB에서 전체 사용자 정보를 조회한 후
+     * 다음 Step에서 사용할 수 있도록 ExecutionContext에 저장
+     *
+     * @author kimdoyeon
+     * @version 1.0.0
+     * @date 25. 12. 17.
+     *
+     ==========================**/
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext){
         StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();

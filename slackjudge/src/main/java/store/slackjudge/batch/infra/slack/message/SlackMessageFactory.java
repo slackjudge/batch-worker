@@ -29,6 +29,19 @@ public class SlackMessageFactory {
     @Value("${slack.color.red}")
     private String RED;
 
+    /*==========================
+     *
+     * batchStart
+     *
+     * @parm spec 배치 시작 이벤트 정보 (Job명, 배치 시간, 워커 노드)
+     * @return Attachment 배치 시작 알림용 Slack Attachment
+     * 배치 시작 시점을 Slack 메시지로 구성하여 반환
+     *
+     * @author kimdoyeon
+     * @version 1.0.0
+     * @date 25. 12. 17.
+     *
+     ==========================**/
     public Attachment batchStart(BatchStartMessageSpec spec) {
         String text = layout.render(
                 layout.title("Slack Judge Batch - START"),
@@ -45,7 +58,19 @@ public class SlackMessageFactory {
                 .mrkdwnIn(List.of("text"))
                 .build();
     }
-
+    /*==========================
+     *
+     * batchEnd
+     *
+     * @parm spec 배치 종료 이벤트 정보 (상태, 처리 결과, 소요 시간)
+     * @return Attachment 배치 종료 알림용 Slack Attachment
+     * 배치 성공/실패 여부에 따라 색상을 구분하여 결과 메시지를 생성
+     *
+     * @author kimdoyeon
+     * @version 1.0.0
+     * @date 25. 12. 17.
+     *
+     ==========================**/
     public Attachment batchEnd(BatchEndMessageSpec spec) {
         String text = layout.render(
                 layout.title("SlackJudge Batch - " + spec.status()),

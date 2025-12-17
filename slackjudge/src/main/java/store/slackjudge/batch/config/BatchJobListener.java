@@ -12,7 +12,7 @@ import store.slackjudge.batch.infra.slack.SlackNotificationService;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Objects;
+
 
 @Component
 @RequiredArgsConstructor
@@ -24,6 +24,17 @@ public class BatchJobListener {
     private final SlackNotificationService notificationService;
     private final CalculateSnapShotDate calculateSnapShotDate;
 
+    /*==========================
+    *
+    * BatchJobListener
+    * BatchJob 실행 이전 수행 작업 정의
+    * @parm jobExecution : Job 실행 중에 발생 정보 저장 객체
+    * @return
+    * @author kimdoyeon
+    * @version 1.0.0
+    * @date 25. 12. 17.
+    *
+    ==========================**/
     @BeforeJob
     public void beforeJob(JobExecution jobExecution) {
         logger.jobStart(jobExecution.getJobInstance().getJobName());
@@ -39,6 +50,17 @@ public class BatchJobListener {
         );
     }
 
+    /*==========================
+    *
+    * BatchJobListener
+    * BatchJob 실행 이후 수행 작업 정의
+    * @parm jobExecution : Job 실행 중에 발생 정보 저장 객체
+    * @return
+    * @author kimdoyeon
+    * @version 1.0.0
+    * @date 25. 12. 17.
+    *
+    ==========================**/
     @AfterJob
     public void afterJob(JobExecution jobExecution) {
         ExecutionContext ctx = jobExecution.getExecutionContext();

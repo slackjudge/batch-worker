@@ -1,6 +1,6 @@
 package store.slackjudge.batch.tasklet;
 
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -60,7 +60,23 @@ public class DetectAndUpdateUserTierAndProblemTasklet implements Tasklet {
         this.batchTime = batchTime;
     }
 
-
+    /*==========================
+     *
+     * execute
+     *
+     * @parm contribution Step 실행 기여도 정보
+     * @parm chunkContext Step/Job 실행 컨텍스트
+     * @return RepeatStatus Tasklet 실행 완료 여부
+     *
+     * JobExecutionContext로부터 사용자·스냅샷 데이터를 조회한 후
+     * 티어 및 문제 풀이 변경 사항을 감지·업데이트하고
+     * 현재 스냅샷과 통계 정보를 다음 Step으로 전달.
+     *
+     * @author kimdoyeon
+     * @version 1.0.0
+     * @date 25. 12. 17.
+     *
+     ==========================**/
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         logger.stepStart("DetectAndUpdateUserTierAndProblemTasklet");

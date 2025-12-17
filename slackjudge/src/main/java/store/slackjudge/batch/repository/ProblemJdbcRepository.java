@@ -39,6 +39,21 @@ public class ProblemJdbcRepository {
         jdbcTemplate.update(sql, userId, problemNumber, batchTime);
     }
 
+    /*==========================
+     *
+     * ProblemJdbcRepository
+     *
+     * @parm snapshotAt 문제 풀이 스냅샷 기준 시각
+     * @parm userId 문제를 푼 사용자 ID
+     * @parm problemIds 사용자가 푼 문제 ID 목록
+     * @return void
+     * 사용자별 문제 풀이 정보를 중복 없이 일괄 삽입
+     *
+     * @author kimdoyeon
+     * @version 1.0.0
+     * @date 25. 12. 17.
+     *
+     ==========================**/
     public void batchInsertProblems(LocalDateTime snapshotAt, Long userId, List<Integer> problemIds) {
         String sql = """
             INSERT INTO users_problem (user_id, problem_id, is_solved, solved_time)
