@@ -38,10 +38,6 @@ jobs:
       checks: write
       pull-requests: write
 
-    defaults:
-      run:
-        working-directory: slackjudge
-
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -54,7 +50,7 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: temurin
           cache: gradle
-          cache-dependency-path: slackjudge/*.gradle*
+          cache-dependency-path: '*.gradle*'
 
       - name: Grant execution to Gradle wrapper
         run: chmod +x gradlew
@@ -83,7 +79,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: worker-app
-          path: slackjudge/build/libs/*.jar
+          path: build/libs/*.jar
 
       - name: Integration Summary
         run: |

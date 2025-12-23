@@ -43,11 +43,9 @@ jobs:
           distribution: 'temurin'
 
       - name: Grant execute permission for gradlew
-        working-directory: ./slackjudge
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        working-directory: ./slackjudge
         run: ./gradlew build -x test
 
       - name: Configure AWS credentials
@@ -67,7 +65,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./slackjudge
+          context: .
           push: true
           tags: |
             ${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:${{ github.sha }}
