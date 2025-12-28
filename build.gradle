@@ -53,6 +53,10 @@ dependencies {
 	//Slack
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'com.slack.api:slack-api-client:1.43.0'
+
+	//AWS
+    implementation "software.amazon.awssdk:eventbridge"
+	implementation platform('software.amazon.awssdk:bom:2.20.83')
 }
 
 tasks.named('test') {
