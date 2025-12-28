@@ -8,6 +8,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import store.slackjudge.batch.common.CalculateSnapShotDate;
+import store.slackjudge.batch.infra.aws.EventBridgePublisher;
 import store.slackjudge.batch.infra.slack.SlackNotificationService;
 
 import java.time.Duration;
@@ -23,6 +24,7 @@ public class BatchJobListener {
     private final BatchLogger logger;
     private final SlackNotificationService notificationService;
     private final CalculateSnapShotDate calculateSnapShotDate;
+    private final EventBridgePublisher eventBridgePublisher;
 
     /*==========================
     *
@@ -57,7 +59,7 @@ public class BatchJobListener {
     * @parm jobExecution : Job 실행 중에 발생 정보 저장 객체
     * @return
     * @author kimdoyeon
-    * @version 1.0.0
+    * @version 1.1.0
     * @date 25. 12. 17.
     *
     ==========================**/
@@ -97,9 +99,13 @@ public class BatchJobListener {
 
             //배치 실패 slack 알림 전송
             notificationService.notifyBatchFailed(occurredTime, reason);
+            //배치 살패 시 AWS EventBridge 전송
+            eventBridgePublisher.publishBatchSuccessCompleteEvent(String.valueOf(jobExecution.getJobInstance().getInstanceId()),"FAILED");
         } else {
             //배치 성공 slack 알림 전송
             notificationService.notifyBatchSuccess(durationMs, total, newUser, updated, failedUser,occurredTime);
+            //배치 성공 시 AWS EventBridge 전송
+            eventBridgePublisher.publishBatchSuccessCompleteEvent(String.valueOf(jobExecution.getJobInstance().getInstanceId()),"SUCCESS");
         }
     }
 }
