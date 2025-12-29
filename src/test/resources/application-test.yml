@@ -50,3 +50,8 @@ slack:
 logging:
   level:
     root: WARN
+
+aws:
+  eventbridge:
+    enabled: false
+  region: ap-northeast-2
