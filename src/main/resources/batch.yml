@@ -5,3 +5,8 @@ spring:
     job:
       enabled: false
     name: 'SlackJudge Batch Worker #1'
+
+aws:
+  eventbridge:
+    source: com.slackJudge.batch
+    detail-type: Batch Finished
