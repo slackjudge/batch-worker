@@ -14,7 +14,6 @@ import store.slackjudge.batch.tasklet.*;
 
 @Configuration
 @RequiredArgsConstructor
-@Profile("!test")
 public class BatchConfig {
 
     private final LoadAllUsersTasklet loadAllUsersTasklet;

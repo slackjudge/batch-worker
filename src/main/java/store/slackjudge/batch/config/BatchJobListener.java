@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
-@Profile("!test")
 public class BatchJobListener {
     @Value("${spring.batch.name}")
     private String jobName;

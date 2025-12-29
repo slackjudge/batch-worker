@@ -13,7 +13,6 @@ import software.amazon.awssdk.services.eventbridge.model.PutEventsRequestEntry;
 
 @Service
 @RequiredArgsConstructor
-@Profile("!test")
 public class EventBridgePublisher {
     private final EventBridgeClient bridgeClientBuilder;
     private final ObjectMapper mapper;
