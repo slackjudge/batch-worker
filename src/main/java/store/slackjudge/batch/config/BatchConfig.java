@@ -8,11 +8,13 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.PlatformTransactionManager;
 import store.slackjudge.batch.tasklet.*;
 
 @Configuration
 @RequiredArgsConstructor
+@Profile("!test")
 public class BatchConfig {
 
     private final LoadAllUsersTasklet loadAllUsersTasklet;

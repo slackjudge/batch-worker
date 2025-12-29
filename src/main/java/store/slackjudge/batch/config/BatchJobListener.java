@@ -6,6 +6,7 @@ import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.annotation.BeforeJob;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import store.slackjudge.batch.common.CalculateSnapShotDate;
 import store.slackjudge.batch.infra.aws.EventBridgePublisher;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
+@Profile("!test")
 public class BatchJobListener {
     @Value("${spring.batch.name}")
     private String jobName;
@@ -90,6 +92,7 @@ public class BatchJobListener {
         );
         LocalDateTime occurredTime=calculateSnapShotDate.now();
 
+        String status="";
         //배치 종료 slack 알림 추가
         if (jobExecution.getStatus().isUnsuccessful()) {
             //fail 예외 객체 없으면 기본 값 => Batch failed 출력
@@ -99,13 +102,14 @@ public class BatchJobListener {
 
             //배치 실패 slack 알림 전송
             notificationService.notifyBatchFailed(occurredTime, reason);
-            //배치 살패 시 AWS EventBridge 전송
-            eventBridgePublisher.publishBatchSuccessCompleteEvent(String.valueOf(jobExecution.getJobInstance().getInstanceId()),"FAILED");
+            status="FAILED";
         } else {
             //배치 성공 slack 알림 전송
             notificationService.notifyBatchSuccess(durationMs, total, newUser, updated, failedUser,occurredTime);
-            //배치 성공 시 AWS EventBridge 전송
-            eventBridgePublisher.publishBatchSuccessCompleteEvent(String.valueOf(jobExecution.getJobInstance().getInstanceId()),"SUCCESS");
+            status="SUCCESS";
         }
+
+        //배치 종료 시 AWS EventBridge 전송
+        eventBridgePublisher.publishBatchSuccessCompleteEvent(String.valueOf(jobExecution.getJobInstance().getInstanceId()),status);
     }
 }

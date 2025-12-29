@@ -7,6 +7,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import store.slackjudge.batch.common.CalculateSnapShotDate;
 
@@ -16,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@Profile("!test")
 public class SlackJudgeBatchRunner implements CommandLineRunner {
     private final JobLauncher jobLauncher;
     private final Job slackJudgeBatch;
