@@ -49,10 +49,16 @@ dependencies {
     testImplementation "org.testcontainers:junit-jupiter" // JUnit 5 연동
 	testImplementation 'org.testcontainers:jdbc'
 	testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.11.0'
+	testImplementation "org.testcontainers:mongodb"
+
 
 	//Slack
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'com.slack.api:slack-api-client:1.43.0'
+
+	//AWS
+    implementation "software.amazon.awssdk:eventbridge"
+	implementation platform('software.amazon.awssdk:bom:2.20.83')
 }
 
 tasks.named('test') {

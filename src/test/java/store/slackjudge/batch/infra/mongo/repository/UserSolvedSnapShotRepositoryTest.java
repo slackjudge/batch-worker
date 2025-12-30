@@ -6,12 +6,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.testcontainers.containers.MongoDBContainer;
+import store.slackjudge.batch.MongoContainer;
 import store.slackjudge.batch.SlackjudgeApplication;
 import store.slackjudge.batch.infra.mongo.document.SnapShotId;
 import store.slackjudge.batch.infra.mongo.document.UserSolvedSnapShotDocument;
@@ -26,10 +30,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ContextConfiguration(classes = SlackjudgeApplication.class)
 @DataMongoTest
-@ExtendWith(SpringExtension.class)
-@DirtiesContext
+@Import(MongoAutoConfiguration.class)
 @ActiveProfiles("test")
-class UserSolvedSnapShotRepositoryTest {
+class UserSolvedSnapShotRepositoryTest extends MongoContainer {
     @Autowired
     private UserSolvedSnapShotRepository repository;
 
